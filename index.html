@@ -372,7 +372,7 @@ window._fb={
   <div class="fb-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--purple)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="fb-bar-txt" style="color:var(--muted)">Supabase: подключение...</span><span class="fb-bar-time" id="fb-bar-time">—</span></div>
   <div class="railway-bar" id="railway-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    <span id="railway-bar-txt">Railway: укажи URL в разделе API ключи</span>
+    <span id="railway-bar-txt">VPS: подключение...</span>
     <button class="btn btn-g" style="padding:4px 12px;font-size:11.5px;margin-left:auto;" onclick="checkRailway()">Проверить</button>
   </div>
   <div class="pause-bar" id="pause-bar">
@@ -1198,7 +1198,7 @@ function setFb(ok){
 }
 
 // ── Railway API ───────────────────────────────────────────────────────────────
-function getRailwayUrl(){ return (localStorage.getItem('igs_railway_url')||'').replace(/\/$/,''); }
+function getRailwayUrl(){ return (localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001').replace(/\/$/,''); }
 function saveRailwayUrl(){
   const val = $('railway-url')?.value||'';
   localStorage.setItem('igs_railway_url', val);
@@ -1688,7 +1688,7 @@ function toggleFc(name,cb){
 function clearLogs(){$('log-box').innerHTML='';addLog('✓ Очищено','lok');}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-function init(){
+async function init(){
   updateCount();
   applyState('active');
 
