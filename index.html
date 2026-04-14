@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGS Bot — Панель управления</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0f11;--bg2:#16181c;--bg3:#1e2026;--bg4:#252830;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f0;--muted:#6b7280;
+  --accent:#25d366;--accent-glow:rgba(37,211,102,0.15);
+  --danger:#ef4444;--warn:#f59e0b;--info:#60a5fa;
+  --purple:#a78bfa;--purple-glow:rgba(167,139,250,0.15);
+  --teal:#2dd4bf;--teal-glow:rgba(45,212,191,0.15);
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh;}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);}
+.logo-mark{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;}
+.logo-mark svg{width:18px;height:18px;}
+.logo-title{font-size:13.5px;font-weight:700;}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.nav{padding:14px 10px;flex:1;}
+.ns{font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;padding:0 10px;margin:16px 0 5px;}
+.ns:first-child{margin-top:0;}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .15s;border:none;background:none;width:100%;text-align:left;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--accent-glow);color:var(--accent);}
+.ni svg{width:15px;height:15px;flex-shrink:0;}
+.ni-badge{margin-left:auto;padding:1px 7px;border-radius:20px;font-size:10.5px;font-weight:700;}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--muted);margin-left:auto;flex-shrink:0;}
+.sdot.on{background:var(--accent);box-shadow:0 0 5px var(--accent);animation:pulse 2s infinite;}
+.sdot.off{background:var(--danger);}
+.sdot.pause{background:var(--warn);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sf{padding:14px 18px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted);}
+.fb-row{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;}
+.fb-dot{width:5px;height:5px;border-radius:50%;background:var(--danger);}
+.fb-dot.on{background:var(--accent);box-shadow:0 0 4px var(--accent);}
+.main{padding:32px 36px;overflow-y:auto;}
+.page{display:none;}
+.page.active{display:block;animation:fi .18s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ph{margin-bottom:24px;}
+.ph-title{font-size:21px;font-weight:700;margin-bottom:3px;}
+.ph-sub{font-size:13px;color:var(--muted);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;}
+.ct{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.ct svg{width:13px;height:13px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
+input[type=text],input[type=password],select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Manrope',sans-serif;font-size:13.5px;padding:9px 13px;outline:none;transition:border-color .15s;}
+input[type=text]:focus,input[type=password]:focus,select:focus,textarea:focus{border-color:var(--accent);}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+textarea{resize:vertical;min-height:180px;line-height:1.65;}
+.field{margin-bottom:16px;}
+.fhint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+select option{background:#1e2026;}
+.ccount{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;}
+.divider{height:1px;background:var(--border);margin:18px 0;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn svg{width:14px;height:14px;}
+.btn-p{background:var(--accent);color:#000;}
+.btn-p:hover{background:#1fbe5a;}
+.btn-g{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+.btn-g:hover{border-color:var(--border2);}
+.btn-d{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
+.btn-d:hover{background:rgba(239,68,68,.18);}
+.btn-warn{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2);}
+.btn-warn:hover{background:rgba(245,158,11,.18);}
+.btn-purple{background:var(--purple-glow);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.btn-teal{background:var(--teal-glow);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
+.brow{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap;}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.sc-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.sc-val{font-size:26px;font-weight:700;line-height:1;}
+.sc-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.banner{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.banner-l{display:flex;align-items:center;gap:13px;}
+.bicon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bicon.active{background:var(--accent-glow);border:1px solid rgba(37,211,102,.25);}
+.bicon.paused{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);}
+.bicon.stopped{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);}
+.bicon svg{width:20px;height:20px;flex-shrink:0;}
+.bn{font-size:14.5px;font-weight:700;}
+.bs{font-size:12.5px;color:var(--muted);margin-top:2px;}
+.b{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.b-g{background:rgba(37,211,102,.12);color:var(--accent);}
+.b-r{background:rgba(239,68,68,.12);color:var(--danger);}
+.b-y{background:rgba(245,158,11,.12);color:var(--warn);}
+.b-b{background:rgba(96,165,250,.12);color:var(--info);}
+.b-p{background:var(--purple-glow);color:var(--purple);}
+.b-t{background:var(--teal-glow);color:var(--teal);}
+.tr{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.tr:last-child{border-bottom:none;}
+.ti{flex:1;}
+.tn{font-size:13.5px;font-weight:500;}
+.td{font-size:12px;color:var(--muted);margin-top:1px;}
+.tog{position:relative;width:38px;height:21px;flex-shrink:0;margin-left:14px;}
+.tog input{opacity:0;width:0;height:0;}
+.ts-{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:.2s;}
+.ts-::before{content:'';position:absolute;width:13px;height:13px;left:3px;top:50%;transform:translateY(-50%);background:var(--muted);border-radius:50%;transition:.2s;}
+.tog input:checked+.ts-{background:var(--accent-glow);border-color:var(--accent);}
+.tog input:checked+.ts-::before{transform:translate(17px,-50%);background:var(--accent);}
+.fc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;}
+.fc.enabled{border-left:3px solid var(--accent);}
+.fc.disabled{border-left:3px solid var(--muted);opacity:.55;}
+.fc.escalate{border-left:3px solid var(--warn);}
+.fh{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.fname{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;flex:1;}
+.fpb{font-size:11px;background:var(--purple-glow);color:var(--purple);padding:2px 9px;border-radius:20px;font-weight:700;}
+.fdesc{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.fpl{margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.fpr{display:grid;grid-template-columns:160px 75px 1fr;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;}
+.fpr:last-child{border-bottom:none;}
+.fpr.hd{background:var(--bg3);font-weight:700;color:var(--muted);font-size:10.5px;text-transform:uppercase;}
+.pn{font-family:'JetBrains Mono',monospace;color:var(--purple);}
+.pt{color:var(--warn);font-family:'JetBrains Mono',monospace;font-size:10.5px;}
+.pd{color:var(--muted);}
+.lt{width:100%;border-collapse:collapse;font-size:13px;}
+.lt th{padding:9px 13px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);}
+.lt td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.lt tr:last-child td{border-bottom:none;}
+.lt tr:hover td{background:var(--bg3);}
+.lp{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);}
+.chat-wrap{display:flex;flex-direction:column;height:520px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.chat-header{padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.chat-title{font-size:13.5px;font-weight:700;}
+.chat-sub{font-size:11.5px;color:var(--muted);}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:75%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;}
+.msg.user{background:var(--accent);color:#000;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg.bot{background:var(--bg3);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;}
+.msg.system{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple);font-size:11.5px;align-self:center;text-align:center;max-width:90%;border-radius:8px;}
+.msg.typing{background:var(--bg3);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;color:var(--muted);}
+.msg-meta{font-size:10.5px;margin-top:5px;opacity:.65;}
+.func-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(167,139,250,.12);color:var(--purple);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-top:6px;font-family:'JetBrains Mono',monospace;}
+.chat-input-row{padding:12px;background:var(--bg2);border-top:1px solid var(--border);display:flex;gap:8px;}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Manrope',sans-serif;font-size:13.5px;padding:9px 13px;outline:none;}
+.chat-input:focus{border-color:var(--accent);}
+.split{display:grid;grid-template-columns:280px 1fr;gap:14px;height:580px;}
+.split-left{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-y:auto;}
+.dl{display:flex;flex-direction:column;gap:1px;}
+.di{display:flex;align-items:center;gap:11px;padding:13px 16px;cursor:pointer;border-radius:var(--radius-sm);transition:background .12s;}
+.di:hover{background:var(--bg3);}
+.di.active{background:var(--bg3);border-left:3px solid var(--accent);}
+.di-av{width:36px;height:36px;border-radius:50%;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--accent);flex-shrink:0;}
+.di-info{flex:1;min-width:0;}
+.di-name{font-size:13px;font-weight:600;display:flex;justify-content:space-between;}
+.di-last{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.di-time{font-size:10.5px;color:var(--muted);}
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;height:240px;overflow-y:auto;line-height:1.9;}
+.ll{display:block;}
+.lt2{color:var(--muted);margin-right:7px;}
+.lok{color:var(--accent);}
+.lerr{color:var(--danger);}
+.linf{color:var(--info);}
+.lwarn{color:var(--warn);}
+.lfb{color:var(--purple);}
+.pause-bar{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:10px 16px;display:none;align-items:center;gap:10px;margin-bottom:14px;font-size:13px;color:var(--warn);}
+.pause-bar.show{display:flex;}
+.fb-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 15px;display:flex;align-items:center;gap:11px;margin-bottom:14px;font-size:12.5px;}
+.fb-bar svg{width:14px;height:14px;flex-shrink:0;}
+.fb-bar-time{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.railway-bar{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-sm);padding:11px 15px;display:flex;align-items:center;gap:11px;margin-bottom:14px;font-size:12.5px;color:var(--info);}
+.railway-bar svg{width:14px;height:14px;flex-shrink:0;}
+.ac{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
+.ac-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ac-info{flex:1;}
+.ac-name{font-size:13.5px;font-weight:600;}
+.ac-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.qr-ph{width:150px;height:150px;background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--muted);font-size:11.5px;margin:0 auto 14px;}
+.qr-ph svg{width:30px;height:30px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--accent);color:var(--accent);padding:11px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.err{border-color:var(--danger);color:var(--danger);}
+.toast.warn{border-color:var(--warn);color:var(--warn);}
+.toast.info{border-color:var(--info);color:var(--info);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.stage-hot{background:rgba(239,68,68,.12);color:var(--danger);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.stage-warm{background:rgba(245,158,11,.12);color:var(--warn);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.stage-cold{background:rgba(96,165,250,.12);color:var(--info);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+#qr-image{width:150px;height:150px;margin:0 auto 14px;display:block;}
+</style>
+</head>
+<body>
+
+<!-- Supabase -->
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPA_URL='https://qglkajbaviutmxfwodui.supabase.co';
+const SUPA_KEY='sb_publishable_-d-LvsRXnVznPwDa0IQgVQ_6ngau3R3';
+const sb=createClient(SUPA_URL,SUPA_KEY);
+
+// Загружаем заявки из Supabase
+async function loadLeads(){
+  const{data}=await sb.from('bot_leads').select('*').order('created_at',{ascending:false}).limit(200);
+  if(!data)return;
+  const asObj={};data.forEach(l=>{asObj[l.id||l.chat_id||Date.now()]=l;});
+  window._fbLeads=asObj;
+  updateAll(asObj);
+  setFb(true);
+  addLog('↺ Supabase: заявки загружены','lfb');
+}
+loadLeads();
+setInterval(loadLeads,15000);
+
+// Realtime заявки
+sb.channel('bot_leads').on('postgres_changes',{event:'*',schema:'public',table:'bot_leads'},()=>loadLeads()).subscribe();
+
+// Настройки бота — из API
+async function loadBotSettings(){
+  try{
+    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
+    const r=await fetch(railUrl+'/api/settings');
+    if(!r.ok)return;
+    const s=await r.json();
+    if(s.systemPrompt){const e=document.getElementById('system-prompt');if(e)e.value=s.systemPrompt;}
+    if(s.botName){const e=document.getElementById('bot-name');if(e)e.value=s.botName;}
+    updateCount();
+  }catch(e){}
+}
+loadBotSettings();
+
+// Статус бота — из /api/status
+async function loadBotStatus(){
+  try{
+    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
+    const r=await fetch(railUrl+'/health');
+    if(!r.ok)return;
+    const s=await r.json();
+    if(s.botState)applyState(s.botState);
+    const el=document.getElementById('bst');
+    if(el)el.textContent=s.waConnected?'Онлайн · WhatsApp подключён':'Оффлайн · WhatsApp не подключён';
+    const bt=document.getElementById('fb-bar-txt');
+    if(bt){bt.textContent='Supabase: подключено';bt.style.color='var(--green)';}
+    setFb(true);
+  }catch(e){
+    setFb(false);
+    const bt=document.getElementById('fb-bar-txt');
+    if(bt){bt.textContent='Нет связи с сервером';bt.style.color='var(--warn)';}
+  }
+}
+loadBotStatus();
+setInterval(loadBotStatus,10000);
+// Dialogs — читаем из бота (Supabase), не из Supabase
+async function loadDialogsFromBot(){
+  try{
+    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
+    const r=await fetch(railUrl+'/api/dialogs');
+    if(!r.ok)return;
+    const arr=await r.json();
+    const mapped=arr.map(d=>({
+      id:d.id,
+      messageCount:d.message_count||0,
+      lastActivity:d.last_activity?new Date(d.last_activity).getTime():0,
+      participant_name:d.participant_name||'',
+      stage:d.stage||'',
+      paused:d.paused||false,
+    })).sort((a,b)=>(b.lastActivity||0)-(a.lastActivity||0));
+    renderDialogList(mapped);
+  }catch(e){console.warn('dialogs fetch:',e.message);}
+}
+loadDialogsFromBot();
+setInterval(loadDialogsFromBot,10000);
+// Замена window._fb → Supabase + бот API
+const _botUrl=()=>localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
+window._fb={
+  save:async(path,data)=>{
+    const url=_botUrl();
+    if(path==='bot_settings'||path==='functions'){
+      try{await fetch(url+'/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}
+    }else if(path==='bot_status'){
+      if(data?.state)try{await fetch(url+'/api/bot/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state:data.state})});}catch(e){}
+    }
+  },
+  push:async(path,data)=>{
+    if(path==='leads'){await sb.from('bot_leads').insert({id:'test_'+Date.now(),name:data.Name||'',phone:data.phone||'',stage:data.Stage||'',construction_type:data.Construction_Type||'',location:data.Location||'',dimensions:data.Dimensions||'',measurement_datetime:data.Measurement_Date_Time||'',created_at:new Date().toISOString()});}
+  },
+  update:async()=>{},
+};
+</script>
+
+<div class="shell">
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="logo-title">IGS Bot</div>
+    <div class="logo-sub">Панель управления</div>
+  </div>
+  <nav class="nav">
+    <div class="ns">Главное</div>
+    <button class="ni active" onclick="go('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Дашборд<span class="sdot on" id="nav-dot"></span>
+    </button>
+    <button class="ni" onclick="go('leads',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Заявки<span class="ni-badge b b-y" id="nav-cnt">0</span>
+    </button>
+    <button class="ni" onclick="go('dialogs',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Диалоги
+    </button>
+    <button class="ni" onclick="go('testchat',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      Тестовый чат
+    </button>
+    <div class="ns">Настройка</div>
+    <button class="ni" onclick="go('functions',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Функции
+    </button>
+    <button class="ni" onclick="go('rules',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Правила
+    </button>
+    <button class="ni" onclick="go('prompt',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Промпт
+    </button>
+    <button class="ni" onclick="go('keys',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      API ключи
+    </button>
+    <button class="ni" onclick="go('features',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Возможности
+    </button>
+    <div class="ns">Система</div>
+    <button class="ni" onclick="go('connect',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/></svg>
+      Подключение
+    </button>
+    <button class="ni" onclick="go('constructor',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/><path d="M15 5l3 3"/></svg>
+      Конструктор
+    </button>
+    <button class="ni" onclick="go('learning',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Обучение<span class="ni-badge b b-p" id="nav-feedback-cnt">0</span>
+    </button>
+    <button class="ni" onclick="go('reports',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Отчётность<span class="ni-badge b b-t" id="nav-reports-badge" style="display:none">!</span>
+    </button>
+    <button class="ni" onclick="go('logs',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Логи
+    </button>
+  </nav>
+  <div class="sf">
+    IGS Outdoor © 2025
+    <div class="fb-row"><div class="fb-dot" id="fb-dot"></div><span id="fb-txt">Supabase: подключение...</span></div>
+    <div class="fb-row" style="margin-top:4px;"><div class="fb-dot" id="rail-dot"></div><span id="rail-txt">Railway: не настроен</span></div>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="page-dashboard">
+  <div class="ph"><div class="ph-title">Дашборд</div><div class="ph-sub">Реальное время · Supabase + сервер</div></div>
+  <div class="fb-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--purple)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="fb-bar-txt" style="color:var(--muted)">Supabase: подключение...</span><span class="fb-bar-time" id="fb-bar-time">—</span></div>
+  <div class="railway-bar" id="railway-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    <span id="railway-bar-txt">Railway: укажи URL в разделе API ключи</span>
+    <button class="btn btn-g" style="padding:4px 12px;font-size:11.5px;margin-left:auto;" onclick="checkRailway()">Проверить</button>
+  </div>
+  <div class="pause-bar" id="pause-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    <span>Бот приостановлен. Сообщения не обрабатываются.</span>
+    <button class="btn btn-warn" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="setBotState('active')">Возобновить</button>
+  </div>
+  <div class="banner">
+    <div class="banner-l">
+      <div class="bicon active" id="bicon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div class="bn">IGS Outdoor Bot</div><div class="bs" id="bst">Инициализация...</div></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="b b-g" id="state-badge">Активен</span>
+      <button class="btn btn-warn" onclick="setBotState('paused')" id="btn-pause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Пауза</button>
+      <button class="btn btn-d" onclick="setBotState('stopped')" id="btn-stop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Стоп</button>
+    </div>
+  </div>
+  <div class="sgrid">
+    <div class="sc"><div class="sc-label">Заявок всего</div><div class="sc-val" style="color:var(--accent)" id="s-total">0</div><div class="sc-sub">из Supabase</div></div>
+    <div class="sc"><div class="sc-label">Горячих</div><div class="sc-val" style="color:var(--danger)" id="s-hot">0</div><div class="sc-sub">просят замер</div></div>
+    <div class="sc"><div class="sc-label">Ждут менеджера</div><div class="sc-val" style="color:var(--warn)" id="s-esc">0</div><div class="sc-sub">escalate_to_human</div></div>
+    <div class="sc"><div class="sc-label">Диалогов</div><div class="sc-val" id="s-dialogs">0</div><div class="sc-sub">активных</div></div>
+  </div>
+
+  <!-- Токены -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="ct" style="justify-content:space-between;margin-bottom:14px;">
+      <span>Использование токенов Claude</span>
+      <button class="btn btn-g" style="padding:4px 11px;font-size:12px;" onclick="loadTokenStats()">Обновить</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+      <div class="sc"><div class="sc-label">Сегодня токенов</div><div class="sc-val" style="color:var(--info)" id="tok-today">—</div><div class="sc-sub" id="tok-today-cost">$0.0000</div></div>
+      <div class="sc"><div class="sc-label">За месяц</div><div class="sc-val" style="color:var(--purple)" id="tok-month">—</div><div class="sc-sub" id="tok-month-cost">$0.00</div></div>
+      <div class="sc"><div class="sc-label">Всего вызовов</div><div class="sc-val" id="tok-calls">—</div><div class="sc-sub">запросов к Claude</div></div>
+      <div class="sc"><div class="sc-label">Лимит месяца</div><div class="sc-val" id="tok-limit-pct" style="color:var(--accent)">—%</div><div class="sc-sub" id="tok-limit-sub">использовано</div></div>
+    </div>
+    <!-- Прогресс-бар лимита -->
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;">
+        <span>Использовано токенов в этом месяце</span>
+        <span id="tok-progress-label">0 / 1 000 000</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;">
+        <div id="tok-progress-bar" style="height:100%;background:var(--accent);border-radius:6px;width:0%;transition:width .5s;"></div>
+      </div>
+    </div>
+    <!-- Лимит настройка -->
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;">
+      <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Месячный лимит:</span>
+      <input type="number" id="tok-limit-input" placeholder="1000000" class="mono" style="width:140px;padding:6px 10px;font-size:12.5px;">
+      <button class="btn btn-g" style="padding:6px 13px;font-size:12.5px;" onclick="setTokenLimit()">Сохранить</button>
+      <span style="font-size:11.5px;color:var(--muted);">Sonnet 4: $3/1M input · $15/1M output</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Последние заявки (Supabase live)</div>
+    <div id="dash-leads"><div style="color:var(--muted);font-size:13px;padding:16px 0;text-align:center;">Загрузка...</div></div>
+  </div>
+</div>
+
+<!-- ══ LEADS ══ -->
+<div class="page" id="page-leads">
+  <div class="ph"><div class="ph-title">Заявки</div><div class="ph-sub">Supabase реальное время · все заявки от бота</div></div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div class="ct" style="margin:0;">Все заявки</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('all')">Все</button>
+        <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('hot')">🔥 Горячие</button>
+        <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('escalated')">⚠ Менеджер</button>
+        <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="addTestLead()">+ Тест</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;"><table class="lt"><thead><tr><th>Клиент</th><th>Телефон</th><th>Конструкция</th><th>Адрес</th><th>Размеры</th><th>Замер</th><th>Этап</th><th>Статус</th></tr></thead><tbody id="leads-body"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px;">Загрузка...</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- ══ DIALOGS ══ -->
+<div class="page" id="page-dialogs">
+  <div class="ph"><div class="ph-title">Диалоги</div><div class="ph-sub">История переписки · Supabase · накопительная синхронизация</div></div>
+  <div class="split">
+    <div class="split-left">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Клиенты</div>
+      <div class="dl" id="dialog-list"><div style="padding:20px;color:var(--muted);font-size:13px;">Загрузка диалогов...</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="chat-wrap" style="height:480px;">
+        <div class="chat-header">
+          <div><div class="chat-title" id="dlg-title">Выбери диалог</div><div class="chat-sub" id="dlg-sub">←</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-p" style="padding:5px 11px;font-size:12px;background:rgba(37,211,102,.15);color:var(--accent);border:1px solid rgba(37,211,102,.3);" onclick="quickFeedback('positive')" id="dlg-btn-pos">✅ Хорошо</button>
+            <button class="btn btn-d" style="padding:5px 11px;font-size:12px;" onclick="quickFeedback('negative')" id="dlg-btn-neg">❌ Ошибка</button>
+            <button class="btn btn-warn" style="padding:5px 11px;font-size:12px;" onclick="pauseSelectedDialog()" id="dlg-pause-btn">Пауза</button>
+            <button class="btn btn-d" style="padding:5px 11px;font-size:12px;" onclick="closeSelectedDialog()">Закрыть</button>
+          </div>
+        </div>
+        <div class="chat-msgs" id="dlg-msgs"><div class="msg system">Выбери клиента из списка слева</div></div>
+        <div class="chat-input-row">
+          <input class="chat-input" placeholder="Написать от лица менеджера..." id="dlg-input" onkeydown="if(event.key==='Enter')sendManagerMsg()">
+          <button class="btn btn-p" onclick="sendManagerMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEST CHAT ══ -->
+<div class="page" id="page-testchat">
+  <div class="ph"><div class="ph-title">Тестовый чат</div><div class="ph-sub">Реальный Claude API · виден вызов функций · промпт из настроек</div></div>
+  <div class="chat-wrap" style="height:500px;">
+    <div class="chat-header">
+      <div><div class="chat-title">Тест · IGS Outdoor Bot</div><div class="chat-sub" id="test-status">Введи Claude API Key в настройках</div></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="clearTestChat()">Очистить</button>
+        <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="runScenario()">Авто-сценарий</button>
+      </div>
+    </div>
+    <div class="chat-msgs" id="test-msgs">
+      <div class="msg system">Это тестовый чат с реальным Claude API. Пиши как клиент — бот ответит через твой промпт и покажет какие функции вызвал.</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" placeholder="Напиши как клиент..." id="test-input" onkeydown="if(event.key==='Enter')sendTestMsg()">
+      <button class="btn btn-p" onclick="sendTestMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="ct">Быстрые тесты</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="quickMsg('Здравствуйте, хочу узнать про перголу для ресторана')">Пергола / ресторан</button>
+      <button class="btn btn-g" onclick="quickMsg('Сколько стоит слайдинг на балкон 4 метра?')">Цена слайдинга</button>
+      <button class="btn btn-g" onclick="quickMsg('Соедините меня с менеджером пожалуйста')">Запрос менеджера</button>
+      <button class="btn btn-g" onclick="quickMsg('Zip-штора для открытой террасы 6×3 метра')">Zip-шторы</button>
+      <button class="btn btn-g" onclick="quickMsg('Жарайды, маған перголаның бағасы қанша?')">Казахский</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FUNCTIONS ══ -->
+<div class="page" id="page-functions">
+  <div class="ph"><div class="ph-title">Функции бота</div><div class="ph-sub">Вызываются автоматически · настройки → Supabase → сервер</div></div>
+  <div class="fc enabled" id="fc-save">
+    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('save',this)"><span class="ts-"></span></label><div class="fname">save_user_data</div><span class="fpb">7 параметров</span><span class="b b-g">Активна</span></div>
+    <div class="fdesc">Сохраняет заявку в Firebase → Custom API → Telegram. Вызывается только когда собраны реальные данные из диалога.</div>
+    <div class="fpl">
+      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Инструкция</span></div>
+      <div class="fpr"><span class="pn">Name</span><span class="pt">string</span><span class="pd">Имя клиента из подписи WhatsApp</span></div>
+      <div class="fpr"><span class="pn">Location</span><span class="pt">string</span><span class="pd">Адрес объекта</span></div>
+      <div class="fpr"><span class="pn">Dimensions</span><span class="pt">string</span><span class="pd">Размеры: длина × ширина × высота</span></div>
+      <div class="fpr"><span class="pn">Construction_Type</span><span class="pt">string</span><span class="pd">Тип конструкции</span></div>
+      <div class="fpr"><span class="pn">Measurement_Date_Time</span><span class="pt">string</span><span class="pd">Дата и время замера</span></div>
+      <div class="fpr"><span class="pn">Stage</span><span class="pt">enum</span><span class="pd">горячий · тёплый · холодный</span></div>
+      <div class="fpr"><span class="pn">phone</span><span class="pt">string</span><span class="pd">Номер телефона WhatsApp</span></div>
+    </div>
+  </div>
+  <div class="fc enabled" id="fc-image">
+    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('image',this)"><span class="ts-"></span></label><div class="fname">Image</div><span class="fpb">2 параметра</span><span class="b b-g">Активна</span></div>
+    <div class="fdesc">Срабатывает СРАЗУ при получении фото или видео от клиента. Создаёт заявку со статусом photo и уведомляет менеджера.</div>
+    <div class="fpl">
+      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Описание</span></div>
+      <div class="fpr"><span class="pn">media_url</span><span class="pt">string</span><span class="pd">Описание медиафайла</span></div>
+      <div class="fpr"><span class="pn">caption</span><span class="pt">string</span><span class="pd">Подпись от клиента</span></div>
+    </div>
+  </div>
+  <div class="fc escalate" id="fc-esc">
+    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('esc',this)"><span class="ts-"></span></label><div class="fname">escalate_to_human</div><span class="fpb">1 параметр</span><span class="b b-y">Приоритет</span></div>
+    <div class="fdesc">Клиент просит живого менеджера или перезвонить — бот замолкает, заявка → Firebase → Telegram со статусом escalated.</div>
+    <div class="fpl">
+      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Описание</span></div>
+      <div class="fpr"><span class="pn">reason</span><span class="pt">string</span><span class="pd">Что именно сказал клиент</span></div>
+    </div>
+    <div style="margin-top:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--warn);">После эскалации диалог записывается в Firebase paused_chats — бот не отвечает этому клиенту с любого устройства.</div>
+  </div>
+  <div class="brow"><button class="btn btn-p" onclick="saveFunctions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button></div>
+</div>
+
+<!-- ══ PROMPT ══ -->
+<!-- ══ RULES ══ -->
+<div class="page" id="page-rules">
+  <div class="ph"><div class="ph-title">Правила бота</div><div class="ph-sub">Жёсткие ограничения · гибкость · экономия токенов</div></div>
+
+  <!-- Статус соответствия правилам -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+    <div class="sc"><div class="sc-label">Соответствие правилам</div><div class="sc-val" style="color:var(--accent)" id="rules-compliance">—%</div><div class="sc-sub">из последних диалогов</div></div>
+    <div class="sc"><div class="sc-label">Нарушений правил</div><div class="sc-val" style="color:var(--danger)" id="rules-violations">0</div><div class="sc-sub">зафиксировано</div></div>
+    <div class="sc"><div class="sc-label">Гибкость бота</div><div class="sc-val" style="color:var(--info)" id="rules-flex-val">50%</div><div class="sc-sub">баланс: промпт ↔ импровиз</div></div>
+  </div>
+
+  <!-- Гибкость бота -->
+  <div class="card">
+    <div class="ct" style="margin-bottom:14px;">Гибкость бота</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+      <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Строго по промпту</span>
+      <input type="range" id="flex-slider" min="0" max="100" value="50" style="flex:1;" oninput="updateFlexLabel(this.value)">
+      <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Свободная импровизация</span>
+    </div>
+    <div style="text-align:center;margin-bottom:14px;">
+      <span id="flex-label" style="font-size:13px;color:var(--info);font-weight:600;">Сбалансированный режим (50%)</span>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--muted);margin-bottom:14px;" id="flex-desc">
+      Бот старается следовать промпту но может адаптироваться к нестандартным ситуациям.
+    </div>
+    <button class="btn btn-p" onclick="saveFlexibility()">Сохранить гибкость</button>
+  </div>
+
+  <!-- Экономия токенов -->
+  <div class="card">
+    <div class="ct" style="margin-bottom:14px;">Экономия токенов</div>
+    <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:14px;">
+      ⚠️ Текущий расход ~$0.007/диалог. При 100 диалогах/день = $21/мес. Включи экономию!
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="eco-short" onchange="saveEconomy()">
+        <div><div style="font-size:13.5px;font-weight:600;">Короткие ответы</div><div style="font-size:12px;color:var(--muted);">Бот отвечает максимум 2-3 предложения. Экономия ~30%</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="eco-history" onchange="saveEconomy()">
+        <div><div style="font-size:13.5px;font-weight:600;">Короткая история (5 сообщений)</div><div style="font-size:12px;color:var(--muted);">Бот помнит только 5 последних сообщений вместо 20. Экономия ~60%</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="eco-cache" onchange="saveEconomy()">
+        <div><div style="font-size:13.5px;font-weight:600;">Кэширование промпта</div><div style="font-size:12px;color:var(--muted);">Промпт не пересылается каждый раз. Экономия ~40%</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="eco-haiku" onchange="saveEconomy()">
+        <div><div style="font-size:13.5px;font-weight:600;">Использовать Claude Haiku</div><div style="font-size:12px;color:var(--muted);">В 20 раз дешевле Sonnet. Качество немного ниже. Экономия ~95%</div></div>
+      </label>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--accent);margin-bottom:14px;" id="eco-estimate">
+      Расчётная экономия: 0% · ~$0.007/диалог
+    </div>
+    <button class="btn btn-p" onclick="saveEconomy()">Применить настройки экономии</button>
+  </div>
+
+  <!-- Жёсткие правила -->
+  <div class="card">
+    <div class="ct" style="justify-content:space-between;margin-bottom:14px;">
+      <span>Жёсткие правила</span>
+      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="addRule()">+ Добавить</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Бот НИКОГДА не нарушает эти правила — они вшиты в промпт на уровне системы</div>
+    <div id="rules-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+      <!-- Правила загружаются динамически -->
+    </div>
+    <button class="btn btn-p" onclick="saveRules()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Сохранить правила
+    </button>
+  </div>
+
+  <!-- Баланс Claude API -->
+  <div class="card">
+    <div class="ct" style="margin-bottom:14px;">Баланс Claude API</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">Потрачено сегодня</div><div class="sc-val" id="bal-today">$0.00</div><div class="sc-sub" id="bal-today-tokens">0 токенов</div></div>
+      <div class="sc"><div class="sc-label">Потрачено за месяц</div><div class="sc-val" style="color:var(--warn)" id="bal-month">$0.00</div><div class="sc-sub" id="bal-month-tokens">0 токенов</div></div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;">
+        <span>Месячный лимит</span>
+        <span id="bal-pct">0%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;">
+        <div id="bal-bar" style="height:100%;background:var(--accent);border-radius:6px;width:0%;transition:width .5s;"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+      <input type="number" id="bal-limit" placeholder="Лимит токенов/мес" class="mono" style="flex:1;padding:7px 10px;font-size:13px;">
+      <button class="btn btn-g" onclick="setBalLimit()">Установить лимит</button>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--muted);">
+      Пополнить баланс Claude: <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:var(--accent);">console.anthropic.com/settings/billing</a>
+    </div>
+    <button class="btn btn-teal" style="margin-top:10px;" onclick="loadBalanceStats()">Обновить статистику</button>
+  </div>
+</div>
+
+<div class="page" id="page-prompt">
+  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Сохраняется в Firebase → Railway подхватывает без перезапуска</div></div>
+  <div class="card">
+    <div class="ct">Личность бота</div>
+    <div class="field"><label>Имя бота</label><input type="text" value="Ассистент IGS Outdoor" id="bot-name"></div>
+    <div class="frow">
+      <div class="field"><label>Язык</label><select id="lang"><option value="auto" selected>Авто (рус/каз)</option><option value="ru">Русский</option><option value="kz">Казахский</option></select></div>
+      <div class="field"><label>Тональность</label><select id="tone"><option value="friendly" selected>Дружелюбная</option><option value="formal">Официальная</option></select></div>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>Системный промпт</label>
+      <textarea id="system-prompt" oninput="updateCount()">Ты — вежливый ассистент компании IGS Outdoor (Алматы, Казахстан).
+Компания: биоклиматические перголы, тентовые перголы Toscana, слайдинг, гильотина, zip-шторы, маркизы.
+
+ЗАДАЧА: принять обращение, выяснить потребность, получить фото, сохранить заявку.
+ЯЗЫК: отвечай на языке клиента — русский или казахский.
+
+ФУНКЦИИ:
+- save_user_data: когда собрал Construction_Type + Stage
+- Image: СРАЗУ при получении фото/видео
+- escalate_to_human: если клиент просит менеджера или перезвонить
+
+ЭТАПЫ: горячий=просит замер · тёплый=прислал фото/размеры · холодный=интересуется
+
+НЕ ДАВАЙ ЦЕНЫ. Замер бесплатный — предлагай активно.</textarea>
+      <div class="ccount"><span id="char-count">0</span> символов</div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="savePrompt()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button>
+      <button class="btn btn-g" onclick="pushPromptToRailway()">→ Применить на Railway</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ KEYS ══ -->
+<div class="page" id="page-keys">
+  <div class="ph"><div class="ph-title">API ключи</div><div class="ph-sub">Ключи для тестового чата · Railway URL для управления ботом</div></div>
+  <div class="card">
+    <div class="ct">VPS Backend (твой сервер)</div>
+    <div class="field">
+      <label>URL твоего VPS</label>
+      <input type="text" class="mono" id="railway-url" placeholder="http://45.136.58.180:3001" oninput="saveRailwayUrl()">
+      <div class="fhint">Адрес твоего VPS сервера — дашборд управляет ботом через него. Пример: http://45.136.58.180:3001</div>
+    </div>
+    <div class="brow"><button class="btn btn-teal" onclick="checkRailway()">Проверить соединение</button></div>
+  </div>
+  <div class="card">
+    <div class="ct">Claude API Key (для тестового чата)</div>
+    <div class="field">
+      <label>Claude API Key</label>
+      <input type="password" class="mono" id="claude-key-local" placeholder="sk-ant-api03-...">
+      <div class="fhint">Хранится только в браузере · используется только для тестового чата</div>
+    </div>
+    <div class="field">
+      <label>Модель</label>
+      <select id="claude-model-local">
+        <option value="claude-sonnet-4-20250514" selected>Claude Sonnet 4 — рекомендуется</option>
+        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — быстрее/дешевле</option>
+      </select>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="saveLocalKeys()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить локально</button>
+      <button class="btn btn-teal" onclick="testClaudeKey()">Проверить Claude</button>
+    </div>
+    <div style="margin-top:12px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--accent);">
+      Реальные API ключи (Claude, OpenAI, Telegram, Firebase) вставляются в Railway Variables — не сюда. Здесь только для тестового чата.
+    </div>
+  </div>
+</div>
+
+<!-- ══ FEATURES ══ -->
+<div class="page" id="page-features">
+  <div class="ph"><div class="ph-title">Возможности</div><div class="ph-sub">Сохраняются в Firebase · Railway читает при каждом сообщении</div></div>
+  <div class="card">
+    <div class="ct">Функции</div>
+    <div class="tr"><div class="ti"><div class="tn">Распознавание голосовых</div><div class="td">OpenAI Whisper API</div></div><label class="tog"><input type="checkbox" checked id="f-voice"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Анализ фотографий</div><div class="td">Claude Vision — описывает объект и задаёт вопросы</div></div><label class="tog"><input type="checkbox" checked id="f-photo"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Эскалация к менеджеру</div><div class="td">escalate_to_human + Telegram + пауза диалога в Firebase</div></div><label class="tog"><input type="checkbox" checked id="f-esc"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Накопительная история</div><div class="td">Диалог хранится в Firebase — не теряется при перезапуске</div></div><label class="tog"><input type="checkbox" checked id="f-mem"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Автопауза ночью</div><div class="td">23:00–08:00 Алматы (UTC+5)</div></div><label class="tog"><input type="checkbox" checked id="f-night"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Определение этапа (Stage)</div><div class="td">горячий / тёплый / холодный автоматически</div></div><label class="tog"><input type="checkbox" checked id="f-stage"><span class="ts-"></span></label></div>
+    <div class="tr"><div class="ti"><div class="tn">Антиспам</div><div class="td">Игнорировать сообщения с интервалом < 2 сек</div></div><label class="tog"><input type="checkbox" checked id="f-spam"><span class="ts-"></span></label></div>
+    <div class="brow"><button class="btn btn-p" onclick="saveFeatures()">Сохранить</button></div>
+  </div>
+  <div class="card">
+    <div class="ct">Лимиты</div>
+    <div class="frow">
+      <div class="field"><label>Макс. токенов</label><input type="text" value="1024" id="max-tokens"></div>
+      <div class="field"><label>История (сообщений)</label><input type="text" value="20" id="hist-limit"></div>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label>Задержка ответа (мс)</label>
+        <input type="number" value="1500" id="reply-delay" min="0" max="15000" oninput="updateDelayLabel()">
+        <div class="fhint" id="delay-hint">Пауза 1.5 сек перед ответом — выглядит естественно</div>
+      </div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="dynamic-delay">
+          Динамическая задержка (имитация набора текста)
+        </label>
+        <div class="fhint">+50мс на каждый символ ответа, макс. 8 сек — бот "печатает" как живой человек</div>
+      </div>
+      <div class="field"><label>Антиспам порог (мс)</label><input type="text" value="2000" id="spam-ms"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="ct">🎩 Тональность и официальность</div>
+    <div class="field">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label style="margin:0;">Уровень официальности</label>
+        <span style="font-size:13px;font-weight:700;color:var(--accent);" id="formality-val">30%</span>
+      </div>
+      <input type="range" id="formality-slider" min="0" max="100" value="30" step="5"
+        oninput="updateFormalityLabel(this.value)"
+        style="width:100%;accent-color:var(--accent);cursor:pointer;">
+      <div style="margin-top:8px;padding:10px 13px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent);">
+        <div style="font-size:13px;font-weight:600;color:var(--text);" id="formality-label">Дружелюбный</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;" id="formality-desc">Тёплый, живой стиль — хороший менеджер в WhatsApp</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px;padding:0 2px;">
+        <span>😊 Неформально</span><span>🤝 Дружелюбно</span><span>💼 Официально</span><span>🎩 Строго</span>
+      </div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="saveFeatures()">Сохранить</button>
+      <button class="btn btn-g" onclick="saveFormalityOnly()">Применить тональность →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONNECT ══ -->
+<div class="page" id="page-connect">
+  <div class="ph"><div class="ph-title">Подключение WhatsApp</div><div class="ph-sub">QR-код с Railway сервера</div></div>
+  <div class="card" style="text-align:center;padding:32px;">
+    <div id="qr-wrap">
+      <div class="qr-ph" id="qr-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="var(--muted)"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M18 14h.01M14 18h.01M18 18h.01"/></svg>
+        <span id="qr-status-txt">Укажи VPS URL и нажми "Получить QR"</span>
+      </div>
+      <img id="qr-image" style="display:none;width:220px;height:220px;margin:0 auto 14px;border:3px solid var(--accent);border-radius:12px;padding:8px;background:white;" alt="QR код WhatsApp">
+    </div>
+    <div id="qr-connected" style="display:none;padding:20px;">
+      <div style="font-size:40px;margin-bottom:10px;">✅</div>
+      <div style="font-size:16px;font-weight:700;color:var(--accent);">WhatsApp подключён!</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px;" id="qr-phone"></div>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin:14px 0;max-width:380px;margin-left:auto;margin-right:auto;">Отсканируй QR в WhatsApp → Настройки → Связанные устройства → Привязать устройство</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-p" onclick="fetchQR()" id="qr-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Получить QR
+      </button>
+      <button class="btn btn-g" onclick="startQRAutoRefresh()" id="qr-auto-btn">Авто-обновление</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Инструкция</div>
+    <div style="font-size:13px;color:var(--muted);line-height:2.4;">
+      <div><span style="color:var(--accent);font-weight:700;">1.</span> Загрузи zip на GitHub</div>
+      <div><span style="color:var(--accent);font-weight:700;">2.</span> Railway → New Project → Deploy from GitHub</div>
+      <div><span style="color:var(--accent);font-weight:700;">3.</span> Добавь Variables из .env.example</div>
+      <div><span style="color:var(--accent);font-weight:700;">4.</span> Скопируй Railway URL → раздел API ключи</div>
+      <div><span style="color:var(--accent);font-weight:700;">5.</span> Нажми "Обновить QR" → отсканируй в WhatsApp</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGS ══ -->
+<!-- ══ LEARNING ══ -->
+<!-- ══ CONSTRUCTOR ══ -->
+<div class="page" id="page-constructor">
+  <div class="ph"><div class="ph-title">Конструктор промпта</div><div class="ph-sub">Общайся с Claude — он поможет создать промпт для бота и применит его одной кнопкой</div></div>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start;">
+
+    <!-- Чат с Claude -->
+    <div class="chat-wrap" style="height:560px;">
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">Чат с Claude — конструктор бота</div>
+          <div class="chat-sub" id="con-status">Опиши своего бота — Claude поможет создать промпт</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="clearConstructor()">Очистить</button>
+          <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="startConstructor()">Начать заново</button>
+        </div>
+      </div>
+      <div class="chat-msgs" id="con-msgs">
+        <div class="msg system">Привет! Я помогу создать промпт для твоего AI бота. Расскажи: какой это бизнес, что делает бот, как должен общаться с клиентами?</div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="con-input" placeholder="Опиши бизнес, задачи бота, стиль общения..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendConstructorMsg()">
+        <button class="btn btn-p" onclick="sendConstructorMsg()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Панель промпта -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card" style="padding:18px;">
+        <div class="ct" style="margin-bottom:12px;">Сгенерированный промпт</div>
+        <textarea id="con-prompt-result" style="min-height:320px;font-size:12.5px;line-height:1.7;" placeholder="Здесь появится промпт после того как Claude его сгенерирует..."></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-p" style="flex:1;justify-content:center;" onclick="applyConstructorPrompt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Применить к боту
+          </button>
+          <button class="btn btn-g" onclick="copyConstructorPrompt()">Копировать</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:18px;background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.2);">
+        <div class="ct" style="color:var(--purple);margin-bottom:10px;">Быстрые команды</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('improve')">✨ Улучшить текущий промпт</button>
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('kazakh')">🇰🇿 Усилить казахский язык</button>
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('objections')">💬 Больше работы с возражениями</button>
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('upsell')">💰 Добавить логику допродаж</button>
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('speed')">⚡ Сделать промпт короче</button>
+          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('custom')">✏️ Свой запрос</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--muted);">Claude уже знает всё об IGS Outdoor — просто скажи что изменить</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-learning">
+  <div class="ph"><div class="ph-title">Обучение бота</div><div class="ph-sub">Оценивай диалоги → бот учится на следующих разговорах</div></div>
+
+  <!-- Как это работает -->
+  <div class="card" style="background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.2);">
+    <div class="ct" style="color:var(--purple);">Как работает обучение</div>
+    <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.9;">
+      <div>1. Открываешь диалог в разделе <b>Диалоги</b></div>
+      <div>2. Нажимаешь ✅ или ❌ и пишешь объяснение</div>
+      <div>3. Оценка сохраняется в Firebase</div>
+      <div>4. <b>В следующем диалоге</b> бот видит последние оценки прямо в промпте и не повторяет ошибки</div>
+    </div>
+  </div>
+
+  <!-- Форма новой оценки -->
+  <div class="card">
+    <div class="ct">Оценить диалог вручную</div>
+    <div class="field">
+      <label>Номер клиента (chatId)</label>
+      <input type="text" class="mono" id="fb-chatid" placeholder="+77011234567@c.us">
+    </div>
+    <div class="field">
+      <label>Оценка</label>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn" id="btn-pos" onclick="selectRating('positive')" style="flex:1;justify-content:center;background:rgba(37,211,102,.1);color:var(--accent);border:1px solid rgba(37,211,102,.3);">
+          ✅ Хороший диалог
+        </button>
+        <button class="btn" id="btn-neg" onclick="selectRating('negative')" style="flex:1;justify-content:center;background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3);">
+          ❌ Плохой диалог
+        </button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Объяснение — что пошло не так / что было хорошо</label>
+      <textarea id="fb-comment" style="min-height:90px;" placeholder="Например: бот задал сразу 3 вопроса и клиент перестал отвечать"></textarea>
+    </div>
+    <div class="field">
+      <label>Пример фразы бота (опционально)</label>
+      <input type="text" id="fb-example" placeholder='Например: "Укажите длину, ширину, высоту и адрес объекта"'>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="submitFeedback()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Сохранить оценку
+      </button>
+      <button class="btn btn-teal" onclick="previewPrompt()">Посмотреть текущий промпт</button>
+    </div>
+  </div>
+
+  <!-- Статистика оценок -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div class="sc"><div class="sc-label">Всего оценок</div><div class="sc-val" id="fb-total">0</div><div class="sc-sub">накоплено</div></div>
+    <div class="sc"><div class="sc-label">Положительных</div><div class="sc-val" style="color:var(--accent)" id="fb-pos">0</div><div class="sc-sub">✅ хороших диалогов</div></div>
+    <div class="sc"><div class="sc-label">Отрицательных</div><div class="sc-val" style="color:var(--danger)" id="fb-neg">0</div><div class="sc-sub">❌ ошибок</div></div>
+  </div>
+
+  <!-- Паттерны ошибок -->
+  <div class="card">
+    <div class="ct" style="justify-content:space-between;margin-bottom:12px;">
+      <span>Автоматически обнаруженные ошибки</span>
+      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="loadErrorPatterns()">Обновить</button>
+    </div>
+    <div id="error-patterns-list">
+      <div style="color:var(--muted);font-size:13px;padding:12px 0;">Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- Список оценок -->
+  <div class="card">
+    <div class="ct" style="justify-content:space-between;margin-bottom:12px;">
+      <span>История оценок</span>
+      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="loadFeedbackList()">Обновить</button>
+    </div>
+    <div id="feedback-list">
+      <div style="color:var(--muted);font-size:13px;padding:12px 0;">Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- Промпт превью -->
+  <div class="card" id="prompt-preview-card" style="display:none;">
+    <div class="ct">Текущий промпт бота (с обучением)</div>
+    <pre id="prompt-preview-text" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);white-space:pre-wrap;line-height:1.7;max-height:400px;overflow-y:auto;"></pre>
+  </div>
+</div>
+
+<div class="page" id="page-logs">
+  <div class="ph"><div class="ph-title">Логи</div><div class="ph-sub">Журнал дашборда · для Railway логов смотри в Railway → Logs</div></div>
+  <div class="card">
+    <div class="ct" style="justify-content:space-between;margin-bottom:10px;">
+      <span>Консоль дашборда</span>
+      <button class="btn btn-g" style="padding:4px 11px;font-size:11.5px;" onclick="clearLogs()">Очистить</button>
+    </div>
+    <div class="log-box" id="log-box"></div>
+  </div>
+</div>
+
+<!-- ══ REPORTS ══ -->
+<div class="page" id="page-reports">
+  <div class="ph">
+    <div class="ph-title">📊 Отчётность бота</div>
+    <div class="ph-sub">Статистика диалогов, лидов и токенов</div>
+  </div>
+
+  <!-- Период -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <label>От</label>
+        <input type="date" id="rep-from" style="width:100%;">
+      </div>
+      <div style="flex:1;min-width:160px;">
+        <label>До</label>
+        <input type="date" id="rep-to" style="width:100%;">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:flex-end;padding-bottom:1px;">
+        <button class="btn btn-g" onclick="setRepPeriod(7)">7 дней</button>
+        <button class="btn btn-g" onclick="setRepPeriod(30)">30 дней</button>
+        <button class="btn btn-p" onclick="loadReports()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Обновить
+        </button>
+        <button class="btn btn-g" onclick="exportReportCSV()" title="Скачать CSV">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Вкладки внутри отчётности -->
+  <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+    <button id="rtab-main"  class="btn btn-p"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('main')">📊 Общее</button>
+    <button id="rtab-leads" class="btn btn-g"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('leads')">🔥 Заявки</button>
+    <button id="rtab-meas"  class="btn btn-g"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('meas')">📐 Замеры</button>
+    <button id="rtab-show"  class="btn btn-g"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('show')">🏠 Шоурум</button>
+    <button id="rtab-media" class="btn btn-g"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('media')">📸 Медиа</button>
+    <button id="rtab-conv"  class="btn btn-g"  style="font-size:12px;padding:6px 14px;" onclick="switchRepTab('conv')">💬 Диалоги</button>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: ОБЩЕЕ ═══ -->
+  <div id="reptab-main">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;">
+      <div class="sc"><div class="sc-label">Входящих сообщений</div><div class="sc-val" id="rep-msgs-in">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">Ответов бота</div><div class="sc-val" id="rep-msgs-out">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">Лидов сохранено</div><div class="sc-val" id="rep-leads">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">Горячих + Тёплых</div><div class="sc-val" style="color:var(--danger)" id="rep-hot">—</div><div class="sc-sub">качественных лидов</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">📐 Запросов замера</div><div class="sc-val" style="color:var(--info)" id="rep-measures">—</div><div class="sc-sub">назвали время</div></div>
+      <div class="sc"><div class="sc-label">🏠 Встреч в шоуруме</div><div class="sc-val" style="color:var(--teal)" id="rep-showroom">—</div><div class="sc-sub">записано</div></div>
+      <div class="sc"><div class="sc-label">📞 Передано менеджеру</div><div class="sc-val" style="color:var(--warn)" id="rep-escalated">—</div><div class="sc-sub">эскалаций</div></div>
+      <div class="sc"><div class="sc-label">Конверсия в лид</div><div class="sc-val" style="color:var(--accent)" id="rep-conv">—</div><div class="sc-sub">лиды / входящих</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">🔁 Follow-up</div><div class="sc-val" style="color:var(--purple)" id="rep-followup">—</div><div class="sc-sub">авто-напоминаний</div></div>
+      <div class="sc"><div class="sc-label">🌙 Ночных сообщений</div><div class="sc-val" style="color:var(--muted)" id="rep-night">—</div><div class="sc-sub">вне рабочих часов</div></div>
+      <div class="sc"><div class="sc-label">🚫 Отказов</div><div class="sc-val" style="color:var(--danger)" id="rep-refused">—</div><div class="sc-sub">"не интересует"</div></div>
+      <div class="sc"><div class="sc-label">📸 Прислали фото</div><div class="sc-val" style="color:var(--info)" id="rep-photos">—</div><div class="sc-sub">за период</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: ЗАЯВКИ ═══ -->
+  <div id="reptab-leads" style="display:none;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">Всего заявок</div><div class="sc-val" id="rep2-total">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">🔥 Горячих</div><div class="sc-val" style="color:#ef4444" id="rep2-hot">—</div><div class="sc-sub">готовы к замеру</div></div>
+      <div class="sc"><div class="sc-label">🌡 Тёплых</div><div class="sc-val" style="color:#f59e0b" id="rep2-warm">—</div><div class="sc-sub">интересуются</div></div>
+      <div class="sc"><div class="sc-label">❄️ Холодных</div><div class="sc-val" style="color:#60a5fa" id="rep2-cold">—</div><div class="sc-sub">на этапе изучения</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="ct">📅 Заявки по дням</div>
+        <canvas id="rep-chart-leads-days" height="200"></canvas>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="ct">🏗 По типу конструкции</div>
+        <canvas id="rep-chart-products" height="200"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Воронка заявок</div>
+      <div id="rep-funnel" style="display:flex;flex-direction:column;gap:8px;padding:4px 0;"></div>
+    </div>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: ЗАМЕРЫ ═══ -->
+  <div id="reptab-meas" style="display:none;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">📐 Запросов замера</div><div class="sc-val" style="color:var(--info)" id="rep3-measures">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">📞 Эскалаций под замер</div><div class="sc-val" style="color:var(--warn)" id="rep3-escm">—</div><div class="sc-sub">передано менеджеру</div></div>
+      <div class="sc"><div class="sc-label">% из горячих</div><div class="sc-val" style="color:var(--accent)" id="rep3-pct">—</div><div class="sc-sub">горячие → замер</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">📅 Замеры по дням</div>
+      <canvas id="rep-chart-meas-days" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="ct">📋 Список запросов замера</div>
+      <div id="rep-meas-list" style="max-height:360px;overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: ШОУРУМ ═══ -->
+  <div id="reptab-show" style="display:none;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">🏠 Встреч в шоуруме</div><div class="sc-val" style="color:var(--teal)" id="rep4-total">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">% конверсии</div><div class="sc-val" style="color:var(--accent)" id="rep4-pct">—</div><div class="sc-sub">из всех лидов</div></div>
+      <div class="sc"><div class="sc-label">Follow-up после шоурума</div><div class="sc-val" style="color:var(--purple)" id="rep4-fu">—</div><div class="sc-sub">напоминаний</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">📅 Записи в шоурум по дням</div>
+      <canvas id="rep-chart-show-days" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="ct">📋 Список записей в шоурум</div>
+      <div id="rep-show-list" style="max-height:360px;overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: МЕДИА ═══ -->
+  <div id="reptab-media" style="display:none;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">
+      <div class="sc"><div class="sc-label">📸 Фото от клиентов</div><div class="sc-val" style="color:var(--info)" id="rep5-photos">—</div><div class="sc-sub">за период</div></div>
+      <div class="sc"><div class="sc-label">🎙 Голосовых</div><div class="sc-val" style="color:var(--purple)" id="rep5-voice">—</div><div class="sc-sub">аудиосообщений</div></div>
+      <div class="sc"><div class="sc-label">🌙 Ночных</div><div class="sc-val" style="color:var(--muted)" id="rep5-night">—</div><div class="sc-sub">вне рабочих часов</div></div>
+      <div class="sc"><div class="sc-label">🚫 Отказов</div><div class="sc-val" style="color:var(--danger)" id="rep5-refused">—</div><div class="sc-sub">"не интересует"</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">📊 Активность по типам сообщений</div>
+      <canvas id="rep-chart-media" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- ═══ ВКЛАДКА: ДИАЛОГИ ═══ -->
+  <div id="reptab-conv" style="display:none;">
+
+  <!-- Charts in main tab -->
+  <div id="rep-main-charts">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="ct">📈 Активность по дням</div>
+        <canvas id="rep-chart-days" height="200"></canvas>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="ct">💰 Токены по дням</div>
+        <canvas id="rep-chart-tokens" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Топ диалоги (вкладка Диалоги) -->
+
+  </div><!-- /reptab-conv -->
+
+  <!-- Лог событий — всегда виден -->
+  <div class="card">
+    <div class="ct" style="justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:7px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Лог событий
+      </span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <select id="rep-event-filter" onchange="filterRepEvents()" style="padding:4px 8px;font-size:12px;width:auto;">
+          <option value="">Все события</option>
+          <option value="message_in">Входящие</option>
+          <option value="message_out">Ответы</option>
+          <option value="lead_saved">Лиды</option>
+          <option value="escalated">Эскалации</option>
+          <option value="showroom_booked">Шоурум</option>
+        </select>
+        <button class="btn btn-g" style="padding:4px 10px;font-size:11px;" onclick="loadReportDay()">За сегодня</button>
+      </div>
+    </div>
+    <div id="rep-events-list" style="max-height:340px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-txt">OK</span></div>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const now = () => new Date().toTimeString().slice(0,8);
+window._botState   = 'active';
+window._testHistory = [];
+window._currentChatId = null;
+let _filter = 'all';
+
+function addLog(t,c){
+  const b=$('log-box');if(!b)return;
+  const l=document.createElement('span');l.className='ll';
+  l.innerHTML=`<span class="lt2">${now()}</span><span class="${c||'linf'}">${t}</span>`;
+  b.appendChild(l);b.scrollTop=b.scrollHeight;
+}
+function toast(msg,type){
+  const el=$('toast');$('toast-txt').textContent=msg;
+  el.className='toast'+(type?' '+type:'');el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+function go(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
+  $('page-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function updateCount(){const el=$('system-prompt');if(el&&$('char-count'))$('char-count').textContent=el.value.length;}
+function setFb(ok){
+  const d=$('fb-dot'),t=$('fb-txt'),bt=$('fb-bar-txt'),btt=$('fb-bar-time');
+  if(d)d.className='fb-dot'+(ok?' on':'');
+  if(t)t.textContent=ok?'Supabase: подключён':'Supabase: ошибка';
+  if(bt){bt.textContent=ok?'Supabase синхронизирован':'Supabase: ошибка';bt.style.color=ok?'var(--accent)':'var(--danger)';}
+  if(btt)btt.textContent=now();
+}
+
+// ── Railway API ───────────────────────────────────────────────────────────────
+function getRailwayUrl(){ return (localStorage.getItem('igs_railway_url')||'').replace(/\/$/,''); }
+function saveRailwayUrl(){
+  const val = $('railway-url')?.value||'';
+  localStorage.setItem('igs_railway_url', val);
+  if(val) checkRailway();
+}
+
+async function railwayFetch(path, opts={}){
+  const base = getRailwayUrl();
+  if(!base) throw new Error('VPS URL не указан');
+  const res = await fetch(base+path, {
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    mode: 'cors',
+    ...opts
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function checkRailway(){
+  const base=getRailwayUrl();
+  if(!base){toast('Укажи Railway URL в разделе API ключи','warn');return;}
+  try {
+    const data = await railwayFetch('/health');
+    $('rail-dot').className='fb-dot on';
+    $('rail-txt').textContent=`Railway: OK · uptime ${data.uptime}s`;
+    $('railway-bar-txt').textContent=`Railway подключён · бот ${data.botState} · uptime ${data.uptime}s`;
+    toast('Railway: соединение установлено');
+    addLog(`✓ Railway: ok (${data.botState})`,'lok');
+    // Также получаем полный статус
+    const status = await railwayFetch('/api/status');
+    $('s-dialogs').textContent = status.activeChats||0;
+    applyState(status.botState||'active');
+  } catch(e){
+    $('rail-dot').className='fb-dot';
+    $('rail-txt').textContent=`Railway: ошибка — ${e.message}`;
+    $('railway-bar-txt').textContent=`Railway: ошибка подключения — ${e.message}`;
+    toast('Railway: '+e.message,'err');
+    addLog(`✗ Railway: ${e.message}`,'lerr');
+  }
+}
+
+// ── Bot state ─────────────────────────────────────────────────────────────────
+function applyState(state){
+  window._botState=state;
+  const badge=$('state-badge'),bst=$('bst'),icon=$('bicon'),pb=$('pause-bar'),nd=$('nav-dot');
+  const states={
+    active:{cls:'b b-g',txt:'Активен',icon:'bicon active',svgColor:'var(--accent)',status:'Онлайн · WhatsApp подключён',dot:'sdot on',pb:false},
+    paused:{cls:'b b-y',txt:'На паузе',icon:'bicon paused',svgColor:'var(--warn)',status:'Пауза · Сообщения не обрабатываются',dot:'sdot pause',pb:true},
+    stopped:{cls:'b b-r',txt:'Остановлен',icon:'bicon stopped',svgColor:'var(--danger)',status:'Оффлайн · Бот не отвечает',dot:'sdot off',pb:false},
+  };
+  const s=states[state]||states.active;
+  if(badge){badge.className=s.cls;badge.textContent=s.txt;}
+  if(icon){icon.className=s.icon;icon.querySelector('svg').setAttribute('stroke',s.svgColor);}
+  if(nd)nd.className=s.dot;
+  if(pb)pb.className='pause-bar'+(s.pb?' show':'');
+  const btnStop=$('btn-stop');
+  if(btnStop){
+    btnStop.className='btn '+(state==='stopped'?'btn-g':'btn-d');
+    btnStop.innerHTML=state==='stopped'
+      ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>Запустить`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Стоп`;
+    btnStop.onclick=()=>setBotState(state==='stopped'?'active':'stopped');
+  }
+}
+
+async function setBotState(state){
+  // 1. Сохраняем в Firebase (мгновенно)
+  if(window._fb) window._fb.save('bot_status',{state,updatedAt:Date.now()});
+  applyState(state);
+  // 2. Отправляем на Railway (бэкенд)
+  try {
+    await railwayFetch('/api/bot/state',{method:'POST',body:JSON.stringify({state})});
+    addLog(`✓ Бот: ${state}`,'lok');
+  } catch(e){
+    addLog(`⚠ Railway не отвечает (Настройки обновлены): ${e.message}`,'lwarn');
+  }
+  toast({active:'Бот запущен',paused:'Бот на паузе',stopped:'Бот остановлен'}[state]);
+}
+
+// ── Leads ─────────────────────────────────────────────────────────────────────
+function updateAll(data){
+  const leads=data?Object.entries(data).map(([id,v])=>({id,...v})).reverse():[];
+  if($('s-total'))$('s-total').textContent=leads.length;
+  if($('s-hot'))$('s-hot').textContent=leads.filter(l=>l.Stage==='горячий').length;
+  if($('s-esc'))$('s-esc').textContent=leads.filter(l=>l.status==='escalated').length;
+  if($('nav-cnt'))$('nav-cnt').textContent=leads.length;
+  renderLeads(leads);
+  renderDashLeads(leads);
+}
+function filterLeads(f){_filter=f;if(window._fbLeads)updateAll(window._fbLeads);}
+function renderLeads(leads){
+  const tb=$('leads-body');if(!tb)return;
+  let fl=leads;
+  if(_filter==='hot')fl=leads.filter(l=>l.Stage==='горячий');
+  if(_filter==='escalated')fl=leads.filter(l=>l.status==='escalated');
+  if(!fl.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px;">Заявок нет</td></tr>`;return;}
+  tb.innerHTML=fl.map(l=>`<tr>
+    <td><span style="font-weight:500">${l.Name||'—'}</span></td>
+    <td><span class="lp">${l.phone||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--muted)">${l.Construction_Type||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--muted)">${l.Location||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--muted)">${l.Dimensions||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--muted)">${l.Measurement_Date_Time||'—'}</span></td>
+    <td>${stagePill(l.Stage)}</td>
+    <td>${statusBadge(l.status)}</td>
+  </tr>`).join('');
+}
+function renderDashLeads(leads){
+  const el=$('dash-leads');if(!el)return;
+  if(!leads.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:14px 0;">Заявок пока нет</div>';return;}
+  el.innerHTML=leads.slice(0,5).map(l=>`
+    <div class="tr" style="padding:11px 0;">
+      <div class="ti">
+        <div class="tn">${l.Name||l.phone||'—'} <span style="font-size:12px;color:var(--muted);font-weight:400;">· ${l.phone||''}</span></div>
+        <div class="td">${[l.Construction_Type,l.Location,l.Dimensions].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center;">${stagePill(l.Stage)} ${statusBadge(l.status)}</div>
+    </div>`).join('');
+}
+function stagePill(s){
+  if(s==='горячий')return`<span class="stage-hot">🔥 горячий</span>`;
+  if(s==='тёплый')return`<span class="stage-warm">☀ тёплый</span>`;
+  if(s==='холодный')return`<span class="stage-cold">❄ холодный</span>`;
+  return'<span style="color:var(--muted)">—</span>';
+}
+function statusBadge(s){
+  return({new:'<span class="b b-b">Новая</span>',escalated:'<span class="b b-y">Нужен менеджер</span>',photo:'<span class="b b-p">Фото</span>',done:'<span class="b b-g">Закрыта</span>'})[s]||'<span class="b b-b">Новая</span>';
+}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
+
+function addTestLead(){
+  if(!window._fb){toast('Нет связи с сервером','err');return;}
+  const types=['Биоклиматическая пергола','Слайдинг','Zip-шторы','Тентовая пергола','Гильотина'];
+  const stages=['горячий','тёплый','холодный'];
+  window._fb.push('leads',{
+    Name:'Тест '+Math.floor(Math.random()*100),
+    phone:'+7 701 '+Math.floor(Math.random()*9000000+1000000),
+    Location:'ул. Абая '+Math.floor(Math.random()*200),
+    Construction_Type:types[Math.floor(Math.random()*types.length)],
+    Dimensions:`${Math.floor(Math.random()*6+2)}×${Math.floor(Math.random()*4+2)} м`,
+    Measurement_Date_Time:'Пятница 15:00',
+    Stage:stages[Math.floor(Math.random()*3)],
+    status:'new',
+  }).then(()=>{toast('Тест заявка добавлена');addLog('↑ save_user_data тест → Firebase','lfb');});
+}
+
+// ── Dialogs ───────────────────────────────────────────────────────────────────
+function renderDialogList(dialogs){
+  const el=$('dialog-list');if(!el)return;
+  if($('s-dialogs'))$('s-dialogs').textContent=dialogs.length;
+  if(!dialogs.length){el.innerHTML='<div style="padding:18px;color:var(--muted);font-size:13px;">Нет диалогов</div>';return;}
+  el.innerHTML=dialogs.map((d,i)=>{
+    const cid=d.chatId||d.id||'?';
+    const phone='+'+cid.replace('@c.us','').replace(/\D/g,'');
+    const name=d.participant_name||d.name||phone;
+    const pauseBadge=d.paused?'<span style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;margin-left:5px;">⏸ ПАУЗА</span>':'';
+    const stageBadge=d.stage?`<span style="background:rgba(37,211,102,.1);color:#25d366;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:3px;">${d.stage}</span>`:'';
+    const leftBorder=d.paused?'border-left:3px solid #f59e0b;':'';
+    const avStyle=d.paused?'background:rgba(245,158,11,.15);color:#f59e0b;':'';
+    return `<div class="di ${i===0?'active':''}" style="${leftBorder}" onclick="openDialog('${cid}',this)">
+      <div class="di-av" style="${avStyle}">${name[0].toUpperCase()}</div>
+      <div class="di-info">
+        <div class="di-name"><span>${name}${pauseBadge}${stageBadge}</span><span class="di-time">${fmtTime(d.lastActivity)}</span></div>
+        <div class="di-last">${phone} · ${d.messageCount||0} сообщ.</div>
+      </div>
+    </div>`;
+  }).join('');
+  if(dialogs[0])openDialog(dialogs[0].chatId||dialogs[0].id, el.querySelector('.di'));
+}
+
+async function openDialog(chatId,el){
+  document.querySelectorAll('.di').forEach(d=>d.classList.remove('active'));
+  if(el)el.classList.add('active');
+  window._currentChatId=chatId;
+  $('dlg-title').textContent=chatId;
+  $('dlg-sub').textContent='Загрузка истории...';
+  const msgs=$('dlg-msgs');
+  msgs.innerHTML='<div class="msg system">Загрузка...</div>';
+
+  try {
+    // Загружаем сообщения из Railway
+    const data = await railwayFetch(`/api/dialogs/${encodeURIComponent(chatId)}/messages`);
+    $('dlg-sub').textContent=`${data.length} сообщений · из Supabase`;
+    msgs.innerHTML=`<div class="msg system">Диалог · ${chatId}</div>`;
+    data.forEach(m=>{
+      const div=document.createElement('div');
+      const isUser=m.role==='user';
+      div.className='msg '+(isUser?'user':'bot');
+      const text=typeof m.content==='string'?m.content:m.content?.find?.(b=>b.type==='text')?.text||'[медиа]';
+      div.innerHTML=`${text}<div class="msg-meta">${fmtTime(m.timestamp)}</div>`;
+      msgs.appendChild(div);
+    });
+    msgs.scrollTop=msgs.scrollHeight;
+  } catch(e){
+    $('dlg-sub').textContent='Railway недоступен — данные из Supabase';
+    msgs.innerHTML='<div class="msg system">Укажи Railway URL для просмотра диалогов</div>';
+  }
+}
+
+async function quickFeedback(rating) {
+  if (!window._currentChatId) { toast('Выбери диалог','warn'); return; }
+  const comment = prompt(rating === 'positive'
+    ? '✅ Что бот сделал хорошо? Опиши кратко:'
+    : '❌ Что пошло не так? Какую ошибку допустил бот?'
+  );
+  if (!comment) return;
+  try {
+    await railwayFetch('/api/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ chatId: window._currentChatId, rating, comment }),
+    });
+    toast(rating === 'positive' ? '✅ Бот запомнил что сработало!' : '❌ Бот запомнит эту ошибку!');
+    addLog(`✓ Оценка [${rating}]: "${comment.slice(0,50)}"`, 'lfb');
+    if($('fb-chatid'))$('fb-chatid').value = window._currentChatId;
+  } catch(e) { toast('Railway: '+e.message,'err'); }
+}
+
+async function pauseSelectedDialog(){
+  if(!window._currentChatId)return;
+  try {
+    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/pause`,{method:'POST'});
+    toast('Диалог приостановлен — синхронизировано','warn');
+    addLog(`⏸ Пауза: ${window._currentChatId}`,'lwarn');
+  } catch(e){ toast('Railway: '+e.message,'err'); }
+}
+
+async function closeSelectedDialog(){
+  if(!window._currentChatId)return;
+  try {
+    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/resume`,{method:'POST'});
+    toast('Диалог возобновлён','info');
+    addLog(`▶ Возобновлён: ${window._currentChatId}`,'lok');
+  } catch(e){ toast('Railway: '+e.message,'err'); }
+}
+
+async function sendManagerMsg(){
+  const inp=$('dlg-input');
+  const msg=inp.value.trim();if(!msg)return;
+  if(!window._currentChatId){toast('Выбери диалог','warn');return;}
+  try {
+    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/send`,{method:'POST',body:JSON.stringify({message:msg})});
+    const div=document.createElement('div');
+    div.className='msg bot';
+    div.innerHTML=`<span style="font-size:10.5px;display:block;opacity:.7;margin-bottom:3px;">👤 Менеджер</span>${msg}<div class="msg-meta">${now()}</div>`;
+    $('dlg-msgs').appendChild(div);
+    $('dlg-msgs').scrollTop=99999;
+    inp.value='';
+    toast('Сообщение отправлено','info');
+  } catch(e){toast('Railway: '+e.message,'err');}
+}
+
+// ── Test Chat — реальный Claude API ──────────────────────────────────────────
+function appendTestMsg(text,role,funcName){
+  const msgs=$('test-msgs');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  let html=text;
+  if(funcName)html+=`<div class="func-tag">⚙ ${funcName}</div>`;
+  html+=`<div class="msg-meta">${now()}</div>`;
+  div.innerHTML=html;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+async function sendTestMsg(){
+  const inp=$('test-input');
+  const msg=inp.value.trim();if(!msg)return;
+  const key=localStorage.getItem('igs_claude_key');
+  if(!key){toast('Укажи Claude API Key в разделе API ключи','warn');return;}
+  inp.value='';
+  appendTestMsg(msg,'user',null);
+  window._testHistory.push({role:'user',content:msg});
+  const typingDiv=appendTestMsg('печатает...','typing',null);
+  $('test-status').textContent='Claude думает...';
+
+  try {
+    const prompt=$('system-prompt')?.value||'Ты ассистент IGS Outdoor.';
+    const model=localStorage.getItem('igs_model')||'claude-sonnet-4-20250514';
+    const tools=[
+      {name:'save_user_data',description:'Сохраняет заявку.',input_schema:{type:'object',properties:{Name:{type:'string'},Location:{type:'string'},Dimensions:{type:'string'},Construction_Type:{type:'string'},Measurement_Date_Time:{type:'string'},Stage:{type:'string',enum:['горячий','тёплый','холодный']},phone:{type:'string'}},required:['Construction_Type','Stage']}},
+      {name:'Image',description:'Вызывай при фото.',input_schema:{type:'object',properties:{caption:{type:'string'}}}},
+      {name:'escalate_to_human',description:'Передаёт менеджеру.',input_schema:{type:'object',properties:{reason:{type:'string'}},required:['reason']}},
+    ];
+
+    // Agentic loop — обрабатываем tool_use правильно
+    let finalText='', funcsCalled=[], loopMsgs=[...window._testHistory];
+
+    for(let i=0;i<5;i++){
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model,max_tokens:1024,system:prompt,tools,messages:loopMsgs}),
+      });
+      if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||resp.status);}
+      const data=await resp.json();
+
+      const toolUseBlocks=data.content.filter(b=>b.type==='tool_use');
+      const textBlocks=data.content.filter(b=>b.type==='text');
+      finalText+=textBlocks.map(b=>b.text).join('');
+
+      if(!toolUseBlocks.length||data.stop_reason==='end_turn'){
+        // Финальный ответ — сохраняем в историю
+        window._testHistory.push({role:'assistant',content:data.content});
+        loopMsgs.push({role:'assistant',content:data.content});
+        break;
+      }
+
+      // Есть tool_use — добавляем ответ ассистента и tool_result
+      loopMsgs.push({role:'assistant',content:data.content});
+      const toolResults=[];
+      for(const tb of toolUseBlocks){
+        funcsCalled.push(tb.name);
+        addLog(`⚙ Тест: ${tb.name}(${JSON.stringify(tb.input)})`,'lfb');
+        toolResults.push({type:'tool_result',tool_use_id:tb.id,content:`Функция ${tb.name} выполнена успешно`});
+      }
+      loopMsgs.push({role:'user',content:toolResults});
+    }
+
+    // Сохраняем финальную историю
+    window._testHistory=[...loopMsgs];
+
+    typingDiv.remove();
+    appendTestMsg(finalText||'(функция выполнена)','bot',funcsCalled.length?funcsCalled.join(', '):null);
+    $('test-status').textContent='Готов · '+model;
+
+    if(funcsCalled.includes('escalate_to_human'))toast('escalate_to_human вызвана!','warn');
+    if(funcsCalled.includes('save_user_data'))toast('save_user_data вызвана!','info');
+    if(funcsCalled.includes('Image'))toast('Image вызвана!','info');
+
+  } catch(e){
+    typingDiv.remove();
+    appendTestMsg('Ошибка: '+e.message,'msg system',null);
+    $('test-status').textContent='Ошибка: '+e.message;
+    toast(e.message,'err');
+  }
+}
+
+function quickMsg(msg){$('test-input').value=msg;sendTestMsg();}
+function clearTestChat(){
+  $('test-msgs').innerHTML='<div class="msg system">Чат очищен.</div>';
+  window._testHistory=[];
+}
+async function runScenario(){
+  clearTestChat();
+  const steps=['Здравствуйте, интересует пергола для ресторана','Терраса 8×5 метров, адрес: Алматы, ул. Сейфуллина 500','Биоклиматическая, хочу выехать на замер в пятницу в 14:00'];
+  for(let i=0;i<steps.length;i++){
+    await new Promise(r=>setTimeout(r,i===0?200:3000));
+    $('test-input').value=steps[i];
+    await sendTestMsg();
+  }
+}
+
+// ── QR ───────────────────────────────────────────────────────────────────────
+let _qrAutoInterval = null;
+
+async function fetchQR(){
+  const btn=$('qr-btn');
+  if(btn) btn.textContent='⏳ Загрузка...';
+  try {
+    const data=await railwayFetch('/api/qr');
+    if(data.status==='connected'||!data.qr){
+      $('qr-placeholder')&&($('qr-placeholder').style.display='none');
+      $('qr-image')&&($('qr-image').style.display='none');
+      $('qr-connected')&&($('qr-connected').style.display='block');
+      if(_qrAutoInterval){clearInterval(_qrAutoInterval);_qrAutoInterval=null;}
+      toast('WhatsApp подключён!');
+    } else if(data.qr){
+      $('qr-placeholder')&&($('qr-placeholder').style.display='none');
+      $('qr-connected')&&($('qr-connected').style.display='none');
+      const img=$('qr-image');
+      if(img){img.src=data.qr;img.style.display='block';}
+      toast('QR код получен — сканируй!','info');
+      addLog('↓ QR код обновлён','lfb');
+    }
+  } catch(e){toast('Укажи VPS URL в разделе API ключи','warn');}
+  if(btn)btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Получить QR';
+}
+
+function startQRAutoRefresh(){
+  if(_qrAutoInterval){clearInterval(_qrAutoInterval);_qrAutoInterval=null;if($('qr-auto-btn'))$('qr-auto-btn').textContent='Авто-обновление';toast('Выключено','info');return;}
+  fetchQR();
+  _qrAutoInterval=setInterval(fetchQR,30000);
+  if($('qr-auto-btn'))$('qr-auto-btn').textContent='⏹ Остановить';
+  toast('Авто-обновление каждые 30 сек','info');
+}
+
+// ── Save functions ────────────────────────────────────────────────────────────
+async function savePrompt(){
+  if(!window._fb){toast('Нет связи с сервером','err');return;}
+  const data={systemPrompt:$('system-prompt')?.value,botName:$('bot-name')?.value,lang:$('lang')?.value,tone:$('tone')?.value,updatedAt:Date.now()};
+  await window._fb.save('bot_settings',data);
+  toast('Промпт сохранён');
+  addLog('↑ bot_settings → Firebase','lfb');
+}
+
+async function pushPromptToRailway(){
+  await savePrompt();
+  try {
+    await railwayFetch('/api/settings',{method:'POST',body:JSON.stringify({systemPrompt:$('system-prompt')?.value})});
+    toast('Промпт применён на Railway!');
+  } catch(e){toast('Настройки обновлены, Railway: '+e.message,'warn');}
+}
+
+// ── Задержка — подсказка ──────────────────────────────────────────────────────
+function updateDelayLabel() {
+  const v = parseInt($('reply-delay')?.value || 1500);
+  const el = $('delay-hint');
+  if (!el) return;
+  if (v === 0) el.textContent = 'Мгновенный ответ — выглядит как бот';
+  else if (v < 500) el.textContent = `Пауза ${v}мс — очень быстро`;
+  else if (v < 2000) el.textContent = `Пауза ${(v/1000).toFixed(1)} сек — естественно`;
+  else if (v < 5000) el.textContent = `Пауза ${(v/1000).toFixed(1)} сек — медленнее, как реальный человек`;
+  else el.textContent = `Пауза ${(v/1000).toFixed(1)} сек — очень медленно`;
+}
+
+// ── Официальность — регулятор ─────────────────────────────────────────────────
+const FORMALITY_LEVELS = [
+  { max:  20, label: 'Неформальный',       desc: '"Привет! Расскажи что хочешь сделать 😊" — как друг', color: '#25d366' },
+  { max:  40, label: 'Дружелюбный',        desc: 'Тёплый, живой стиль — хороший менеджер в WhatsApp', color: '#25d366' },
+  { max:  60, label: 'Сбалансированный',   desc: 'Вежливо, тепло, профессионально — стандарт WhatsApp', color: '#60a5fa' },
+  { max:  80, label: 'Официально-вежливый',desc: 'Строгое "Вы", деловой стиль, минимум эмодзи', color: '#f59e0b' },
+  { max: 100, label: 'Строго официальный', desc: 'Деловые письма, никаких эмодзи, максимальный формализм', color: '#ef4444' },
+];
+
+function updateFormalityLabel(val) {
+  val = parseInt(val);
+  if ($('formality-val')) $('formality-val').textContent = val + '%';
+  const level = FORMALITY_LEVELS.find(l => val <= l.max) || FORMALITY_LEVELS[4];
+  if ($('formality-label')) { $('formality-label').textContent = level.label; $('formality-label').style.color = level.color; }
+  if ($('formality-desc'))  $('formality-desc').textContent = level.desc;
+  // Красим слайдер
+  const slider = $('formality-slider');
+  if (slider) slider.style.accentColor = level.color;
+}
+
+async function saveFormalityOnly() {
+  const val = parseInt($('formality-slider')?.value ?? 30);
+  try {
+    await railwayFetch('/api/settings', { method:'POST', body: JSON.stringify({ formality: val }) });
+    toast(`✓ Тональность применена: ${FORMALITY_LEVELS.find(l=>val<=l.max)?.label || val+'%'}`);
+  } catch(e) { toast('Ошибка применения', 'err'); }
+}
+
+async function saveFeatures(){
+  if(!window._fb){toast('Нет связи с сервером','err');return;}
+  const data={features:{voice:$('f-voice')?.checked,photo:$('f-photo')?.checked,escalate:$('f-esc')?.checked,memory:$('f-mem')?.checked,night:$('f-night')?.checked,stage:$('f-stage')?.checked,spam:$('f-spam')?.checked},maxTokens:$('max-tokens')?.value,histLimit:$('hist-limit')?.value,replyDelay:parseInt($('reply-delay')?.value||1500),dynamicDelay:$('dynamic-delay')?.checked||false,formality:parseInt($('formality-slider')?.value??30),typingSpeed:50,updatedAt:Date.now()};
+  await window._fb.save('bot_settings',{...data});
+  toast('Настройки сохранены');
+}
+
+async function saveFunctions(){
+  if(!window._fb){toast('Нет связи с сервером','err');return;}
+  await window._fb.save('functions',{save_user_data:true,image:true,escalate_to_human:true,updatedAt:Date.now()});
+  toast('Функции сохранены');
+}
+
+function saveLocalKeys(){
+  localStorage.setItem('igs_claude_key',$('claude-key-local')?.value||'');
+  localStorage.setItem('igs_model',$('claude-model-local')?.value||'');
+  toast('Ключи сохранены локально');
+  $('test-status').textContent='Готов к тестированию';
+}
+
+async function testClaudeKey(){
+  const key=localStorage.getItem('igs_claude_key')||$('claude-key-local')?.value;
+  if(!key){toast('Введи Claude API Key','warn');return;}
+  try {
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:5,messages:[{role:'user',content:'hi'}]}),
+    });
+    if(r.ok){toast('Claude API: ключ работает!');addLog('✓ Claude API key: ok','lok');}
+    else{const e=await r.json();toast('Claude: '+e.error?.message,'err');}
+  } catch(e){toast(e.message,'err');}
+}
+
+function toggleFc(name,cb){
+  const el=$('fc-'+name);if(!el)return;
+  if(cb.checked)el.className='fc '+(name==='esc'?'escalate':'enabled');
+  else el.className='fc disabled';
+  const badge=el.querySelector('.b');
+  if(badge){badge.className='b '+(cb.checked?(name==='esc'?'b-y':'b-g'):'b-r');badge.textContent=cb.checked?(name==='esc'?'Приоритет':'Активна'):'Выключена';}
+}
+
+function clearLogs(){$('log-box').innerHTML='';addLog('✓ Очищено','lok');}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init(){
+  updateCount();
+  applyState('active');
+
+  // Восстанавливаем сохранённые значения
+  const railUrl = localStorage.getItem('igs_railway_url') || 'http://45.136.58.180:3001';
+  if($('railway-url')) $('railway-url').value = railUrl;
+  if(railUrl) localStorage.setItem('igs_railway_url', railUrl);
+
+  const key = localStorage.getItem('igs_claude_key') || '';
+  if($('claude-key-local')) $('claude-key-local').value = key;
+
+  const model = localStorage.getItem('igs_model') || 'claude-sonnet-4-20250514';
+  if($('claude-model-local')) $('claude-model-local').value = model;
+
+  addLog('Панель управления загружена · VPS: ' + railUrl, 'linf');
+
+  // Автоподключение к VPS через 1 сек
+  if(railUrl) {
+    addLog('↺ Подключение к VPS...', 'linf');
+    setTimeout(checkRailway, 1000);
+  }
+
+  if(key) if($('test-status')) $('test-status').textContent = 'Готов к тестированию';
+
+  // Загружаем регуляторы из Supabase
+  try {
+    const settings = await railwayFetch('/api/settings').catch(()=>null);
+    if (settings) {
+      if (settings.replyDelay !== undefined && $('reply-delay')) {
+        $('reply-delay').value = settings.replyDelay;
+        updateDelayLabel();
+      }
+      if (settings.formality !== undefined && $('formality-slider')) {
+        $('formality-slider').value = settings.formality;
+        updateFormalityLabel(settings.formality);
+      }
+      if (settings.dynamicDelay !== undefined && $('dynamic-delay'))
+        $('dynamic-delay').checked = settings.dynamicDelay;
+    }
+  } catch(e) {}
+
+  // Обновляем токены через 3 сек
+  setTimeout(() => { if(typeof loadTokenStats === 'function') loadTokenStats(); }, 3000);
+}
+
+
+// ── Rules & Economy & Flexibility ────────────────────────────────────────────
+const DEFAULT_RULES = [
+  'Никогда не назначать дату и время замера самостоятельно',
+  'Не давать точные цены — только примерные с пометкой "от X тенге"',
+  'Не обещать конкретные сроки монтажа',
+  'Задавать максимум один вопрос за раз',
+  'Не упоминать конкурентов ни в каком контексте',
+  'Не представляться как AI или бот — только как менеджер Айгерим',
+];
+
+let _rules = [...DEFAULT_RULES];
+
+function renderRules() {
+  const list = $('rules-list'); if(!list) return;
+  list.innerHTML = _rules.map((r,i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0;"></div>
+      <input type="text" value="${r}" onchange="_rules[${i}]=this.value" style="flex:1;background:transparent;border:none;font-size:13px;color:var(--color-text-primary);outline:none;">
+      <button onclick="_rules.splice(${i},1);renderRules();" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;padding:4px;">×</button>
+    </div>`).join('');
+}
+
+function addRule() {
+  _rules.push('Новое правило — опиши ограничение');
+  renderRules();
+  const inputs = $('rules-list').querySelectorAll('input');
+  const last = inputs[inputs.length-1];
+  if(last) { last.focus(); last.select(); }
+}
+
+async function saveRules() {
+  try {
+    const rulesBlock = '\n\nЖЁСТКИЕ ПРАВИЛА (никогда не нарушай):\n' + _rules.map((r,i) => `${i+1}. ${r}`).join('\n');
+    localStorage.setItem('igs_rules', JSON.stringify(_rules));
+    await railwayFetch('/api/settings', { method:'POST', body: JSON.stringify({ hardRules: _rules }) });
+    toast('✓ Правила сохранены — бот будет соблюдать их!');
+    addLog('✓ Правила обновлены: ' + _rules.length + ' пунктов', 'lfb');
+  } catch(e) {
+    localStorage.setItem('igs_rules', JSON.stringify(_rules));
+    toast('Сохранено локально (Railway недоступен)', 'warn');
+  }
+}
+
+function loadRules() {
+  const saved = localStorage.getItem('igs_rules');
+  if(saved) try { _rules = JSON.parse(saved); } catch(e) {}
+  renderRules();
+}
+
+// Гибкость
+const FLEX_LABELS = {
+  0:  ['Режим робота (0%)', 'Бот строго следует каждой букве промпта. Никаких отклонений.', 'temperature: 0'],
+  25: ['Строгий режим (25%)', 'Бот следует промпту, минимальная адаптация к клиенту.', 'temperature: 0.3'],
+  50: ['Сбалансированный (50%)', 'Бот следует промпту но адаптируется к нестандартным ситуациям.', 'temperature: 0.5'],
+  75: ['Гибкий режим (75%)', 'Бот активно импровизирует в рамках темы.', 'temperature: 0.7'],
+  100:['Свободный режим (100%)', 'Максимальная творческая свобода. Может отходить от промпта.', 'temperature: 1.0'],
+};
+
+function updateFlexLabel(val) {
+  val = parseInt(val);
+  if($('rules-flex-val')) $('rules-flex-val').textContent = val + '%';
+  const closest = [0,25,50,75,100].reduce((a,b) => Math.abs(b-val)<Math.abs(a-val)?b:a);
+  const info = FLEX_LABELS[closest];
+  if($('flex-label')) $('flex-label').textContent = info[0];
+  if($('flex-desc')) $('flex-desc').textContent = info[1] + ' (' + info[2] + ')';
+}
+
+async function saveFlexibility() {
+  const val = parseInt($('flex-slider')?.value || 50);
+  localStorage.setItem('igs_flex', val);
+  try {
+    await railwayFetch('/api/settings', { method:'POST', body: JSON.stringify({ flexibility: val }) });
+    toast('✓ Гибкость сохранена: ' + val + '%');
+  } catch(e) { toast('Сохранено локально', 'warn'); }
+}
+
+// Экономия токенов
+function updateEcoEstimate() {
+  const short   = $('eco-short')?.checked;
+  const history = $('eco-history')?.checked;
+  const cache   = $('eco-cache')?.checked;
+  const haiku   = $('eco-haiku')?.checked;
+  let saving = 0;
+  if(short)   saving += 30;
+  if(history) saving += 40;
+  if(cache)   saving += 20;
+  if(haiku)   saving += 95;
+  saving = Math.min(saving, 97);
+  const baseCost = 0.007;
+  const newCost  = baseCost * (1 - saving/100);
+  const el = $('eco-estimate');
+  if(el) el.textContent = `Расчётная экономия: ${saving}% · ~$${newCost.toFixed(4)}/диалог · ~$${(newCost*100*30).toFixed(2)}/мес (100 диалогов/день)`;
+}
+
+async function saveEconomy() {
+  updateEcoEstimate();
+  const settings = {
+    ecoShortAnswers:  $('eco-short')?.checked || false,
+    ecoShortHistory:  $('eco-history')?.checked || false,
+    ecoCache:         $('eco-cache')?.checked || false,
+    ecoHaiku:         $('eco-haiku')?.checked || false,
+  };
+  // Если Haiku — меняем модель
+  if(settings.ecoHaiku) {
+    settings.model = 'claude-haiku-4-5-20251001';
+  } else {
+    settings.model = localStorage.getItem('igs_model') || 'claude-sonnet-4-20250514';
+  }
+  // Если короткая история — меняем лимит
+  if(settings.ecoShortHistory) settings.histLimit = 5;
+  else settings.histLimit = 20;
+
+  localStorage.setItem('igs_economy', JSON.stringify(settings));
+  try {
+    await railwayFetch('/api/settings', { method:'POST', body: JSON.stringify(settings) });
+    toast('✓ Настройки экономии применены!');
+  } catch(e) { toast('Сохранено локально', 'warn'); }
+}
+
+// Баланс Claude
+async function loadBalanceStats() {
+  try {
+    const data = await railwayFetch('/api/tokens');
+    if(!data) return;
+    if($('bal-today'))  $('bal-today').textContent  = '$' + (data.today?.cost_usd || '0.0000');
+    if($('bal-month'))  $('bal-month').textContent  = '$' + (data.month?.cost_usd || '0.00');
+    if($('bal-today-tokens')) $('bal-today-tokens').textContent = fmtTokens(data.today?.total) + ' токенов';
+    if($('bal-month-tokens')) $('bal-month-tokens').textContent = fmtTokens(data.month?.total) + ' токенов';
+    const pct = data.limit?.used_pct || 0;
+    if($('bal-pct')) $('bal-pct').textContent = pct + '%';
+    if($('bal-bar')) {
+      $('bal-bar').style.width = pct + '%';
+      $('bal-bar').style.background = pct>80?'var(--danger)':pct>60?'var(--warn)':'var(--accent)';
+    }
+    if($('rules-compliance')) $('rules-compliance').textContent = Math.max(0, 100 - (data.total?.calls||0) * 0.1).toFixed(0) + '%';
+  } catch(e) { /* тихо */ }
+}
+
+async function setBalLimit() {
+  const val = parseInt($('bal-limit')?.value);
+  if(!val||val<1000){toast('Введи лимит (мин. 1000)','warn');return;}
+  try {
+    await railwayFetch('/api/tokens/limit',{method:'POST',body:JSON.stringify({limit:val})});
+    toast(`Лимит: ${fmtTokens(val)} токенов/мес`);
+    loadBalanceStats();
+  } catch(e){toast(e.message,'err');}
+}
+
+// Загрузка при открытии раздела правил
+const _origGoRules = window.go || function(){};
+const _prevGo = window.go;
+window.go = function(name, btn) {
+  if(_prevGo) _prevGo(name, btn);
+  if(name === 'rules') {
+    loadRules();
+    loadBalanceStats();
+    updateEcoEstimate();
+    const flex = localStorage.getItem('igs_flex') || 50;
+    if($('flex-slider')) { $('flex-slider').value = flex; updateFlexLabel(flex); }
+    const eco = localStorage.getItem('igs_economy');
+    if(eco) try {
+      const s = JSON.parse(eco);
+      if($('eco-short'))   $('eco-short').checked   = s.ecoShortAnswers||false;
+      if($('eco-history')) $('eco-history').checked = s.ecoShortHistory||false;
+      if($('eco-cache'))   $('eco-cache').checked   = s.ecoCache||false;
+      if($('eco-haiku'))   $('eco-haiku').checked   = s.ecoHaiku||false;
+      updateEcoEstimate();
+    } catch(e) {}
+  }
+};
+
+// ── Prompt Constructor ────────────────────────────────────────────────────────
+const CONSTRUCTOR_SYSTEM = `Ты — эксперт по созданию промптов для AI ботов. У тебя уже есть полная информация об IGS Outdoor:
+
+КОМПАНИЯ: IGS Outdoor, Алматы, Казахстан. Продажа и установка уличных конструкций.
+ПРОДУКТЫ:
+- Биоклиматическая пергола: от 800 000 тенге (алюминий, поворотные ламели)
+- Тентовая пергола Toscana: от 600 000 тенге (ПВХ крыша, итальянский дизайн)
+- Слайдинг: от 400 000 тенге (раздвижное остекление)
+- Гильотина: от 500 000 тенге (вертикальное остекление)
+- Zip-шторы: от 250 000 тенге (ветрозащита до 180 км/ч)
+- Маркизы: от 180 000 тенге
+КЛИЕНТЫ: рестораны, частные дома, офисы, ЖК
+ЯЗЫК: русский и казахский
+БОТ: Айгерим — менеджер IGS Outdoor
+ТЕКУЩИЙ ПРОМПТ БОТА: уже настроен и работает
+
+Ты помогаешь УЛУЧШИТЬ или АДАПТИРОВАТЬ промпт. Отвечай как коллега который хорошо знает этот бизнес.
+
+Когда генерируешь промпт — обязательно заверши блоком:
+---ПРОМПТ---
+[полный промпт]
+---КОНЕЦ---`;
+
+let constructorHistory = [];
+
+function conAppendMsg(text, role, extract) {
+  const msgs = $('con-msgs');
+  if(!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = text.replace(/\n/g, '<br>') + `<div class="msg-meta">${now()}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  if(extract && text.includes('---ПРОМПТ---')) {
+    const match = text.match(/---ПРОМПТ---([\s\S]*?)---КОНЕЦ---/);
+    if(match) {
+      const prompt = match[1].trim();
+      if($('con-prompt-result')) $('con-prompt-result').value = prompt;
+      toast('✓ Промпт сгенерирован!', 'info');
+    }
+  }
+}
+
+async function sendConstructorMsg() {
+  const inp = $('con-input');
+  const msg = inp?.value?.trim();
+  if(!msg) return;
+  const key = localStorage.getItem('igs_claude_key');
+  if(!key) { toast('Укажи Claude API Key в разделе API ключи','warn'); return; }
+  inp.value = '';
+  conAppendMsg(msg, 'user', false);
+  constructorHistory.push({ role:'user', content:msg });
+  const typing = document.createElement('div');
+  typing.className = 'msg typing';
+  typing.textContent = 'Claude думает...';
+  $('con-msgs')?.appendChild(typing);
+  if($('con-msgs')) $('con-msgs').scrollTop = 99999;
+  if($('con-status')) $('con-status').textContent = 'Claude думает...';
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({ model: localStorage.getItem('igs_model')||'claude-sonnet-4-20250514', max_tokens:2000, system: CONSTRUCTOR_SYSTEM, messages: constructorHistory }),
+    });
+    typing.remove();
+    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message);}
+    const data = await resp.json();
+    const reply = data.content.find(b=>b.type==='text')?.text||'';
+    constructorHistory.push({ role:'assistant', content:reply });
+    conAppendMsg(reply, 'bot', true);
+    if($('con-status')) $('con-status').textContent = constructorHistory.length + ' сообщений';
+  } catch(e) {
+    typing.remove();
+    conAppendMsg('Ошибка: '+e.message, 'system', false);
+  }
+}
+
+function clearConstructor() {
+  constructorHistory = [];
+  if($('con-msgs')) $('con-msgs').innerHTML = '<div class="msg system">Чат очищен. Задай вопрос или попроси изменить промпт!</div>';
+  if($('con-prompt-result')) $('con-prompt-result').value = '';
+  if($('con-status')) $('con-status').textContent = 'Задай вопрос или попроси изменить промпт';
+}
+
+function startConstructor() {
+  clearConstructor();
+  $('con-input')?.focus();
+}
+
+async function applyConstructorPrompt() {
+  const prompt = $('con-prompt-result')?.value?.trim();
+  if(!prompt){toast('Сначала сгенерируй промпт','warn');return;}
+  try {
+    await railwayFetch('/api/settings',{method:'POST',body:JSON.stringify({systemPrompt:prompt})});
+    toast('✅ Промпт применён к боту!');
+    if($('system-prompt')) $('system-prompt').value = prompt;
+  } catch(e){ toast('Настройки обновлены, VPS: '+e.message,'warn'); }
+}
+
+function copyConstructorPrompt() {
+  const p = $('con-prompt-result')?.value;
+  if(!p){toast('Нет промпта','warn');return;}
+  navigator.clipboard.writeText(p).then(()=>toast('Скопировано!'));
+}
+
+const TEMPLATES = {
+  improve:  'Улучши текущий промпт — сделай ответы более живыми и убедительными',
+  kazakh:   'Добавь больше казахских фраз и сделай бота лучше для казахоязычных клиентов',
+  objections: 'Добавь больше сценариев работы с возражениями — дорого, подумаю, конкуренты',
+  upsell:   'Добавь логику допродаж — предлагать более дорогие варианты когда клиент готов',
+  speed:    'Сделай промпт короче и быстрее — меньше слов, больше действий',
+  custom:   '',
+};
+
+function useTemplate(type) {
+  const text = TEMPLATES[type];
+  if($('con-input')) {
+    $('con-input').value = text || '';
+    if(text) sendConstructorMsg();
+    else $('con-input').focus();
+  }
+}
+
+let constructorHistory = [];
+
+function conAppendMsg(text, role, extract) {
+  const msgs = $('con-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = text.replace(/\n/g, '<br>') + `<div class="msg-meta">${now()}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Извлекаем промпт если есть
+  if (extract && text.includes('---ПРОМПТ---')) {
+    const match = text.match(/---ПРОМПТ---([\s\S]*?)---КОНЕЦ---/);
+    if (match) {
+      const prompt = match[1].trim();
+      if ($('con-prompt-result')) $('con-prompt-result').value = prompt;
+      toast('✓ Промпт сгенерирован — нажми "Применить к боту"!', 'info');
+      addLog('✓ Конструктор: промпт сгенерирован', 'lfb');
+    }
+  }
+}
+
+async function sendConstructorMsg() {
+  const inp = $('con-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const key = localStorage.getItem('igs_claude_key');
+  if (!key) { toast('Укажи Claude API Key в разделе API ключи', 'warn'); return; }
+
+  inp.value = '';
+  conAppendMsg(msg, 'user', false);
+  constructorHistory.push({ role: 'user', content: msg });
+
+  const typing = document.createElement('div');
+  typing.className = 'msg typing';
+  typing.textContent = 'Claude думает...';
+  $('con-msgs').appendChild(typing);
+  $('con-msgs').scrollTop = 99999;
+  $('con-status').textContent = 'Claude думает...';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: localStorage.getItem('igs_model') || 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: CONSTRUCTOR_SYSTEM,
+        messages: constructorHistory,
+      }),
+    });
+
+    typing.remove();
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error?.message); }
+    const data = await resp.json();
+    const reply = data.content.find(b => b.type === 'text')?.text || '';
+    constructorHistory.push({ role: 'assistant', content: reply });
+    conAppendMsg(reply, 'bot', true);
+    $('con-status').textContent = `${constructorHistory.length} сообщений · готов`;
+  } catch(e) {
+    typing.remove();
+    conAppendMsg('Ошибка: ' + e.message, 'system', false);
+    $('con-status').textContent = 'Ошибка: ' + e.message;
+  }
+}
+
+function clearConstructor() {
+  constructorHistory = [];
+  $('con-msgs').innerHTML = '<div class="msg system">Чат очищен. Опиши своего бота!</div>';
+  if($('con-prompt-result')) $('con-prompt-result').value = '';
+  $('con-status').textContent = 'Опиши своего бота — Claude поможет создать промпт';
+}
+
+function startConstructor() {
+  clearConstructor();
+  $('con-input').value = '';
+  $('con-input').focus();
+}
+
+async function applyConstructorPrompt() {
+  const prompt = $('con-prompt-result')?.value?.trim();
+  if (!prompt) { toast('Сначала сгенерируй промпт в чате', 'warn'); return; }
+
+  // Сохраняем в Firebase
+  if (window._fb) {
+    await window._fb.save('bot_settings', { systemPrompt: prompt, updatedAt: Date.now() });
+  }
+
+  // Применяем на Railway
+  try {
+    await railwayFetch('/api/settings', { method: 'POST', body: JSON.stringify({ systemPrompt: prompt }) });
+    toast('✅ Промпт применён к боту!');
+    addLog('✓ Конструктор: промпт применён к боту', 'lfb');
+    // Синхронизируем с редактором промпта
+    if($('system-prompt')) $('system-prompt').value = prompt;
+  } catch(e) {
+    toast('Настройки обновлены, Railway: ' + e.message, 'warn');
+  }
+}
+
+function copyConstructorPrompt() {
+  const prompt = $('con-prompt-result')?.value;
+  if (!prompt) { toast('Нет промпта для копирования', 'warn'); return; }
+  navigator.clipboard.writeText(prompt).then(() => toast('Скопировано!'));
+}
+
+const TEMPLATES = {
+  restaurant: 'У меня ресторан в Алматы. Бот должен принимать брони столиков, отвечать на вопросы о меню и режиме работы, общаться на русском и казахском.',
+  salon: 'У меня салон красоты. Бот должен записывать клиентов на услуги, рассказывать о ценах, мастерах и акциях.',
+  realty: 'Я риелтор, продаю и сдаю квартиры в Алматы. Бот должен квалифицировать клиентов — покупка или аренда, бюджет, район, и передавать горячих лидов мне.',
+  clinic: 'У меня медицинский центр. Бот записывает на приём к врачам, отвечает на вопросы об услугах и ценах, не даёт медицинских советов.',
+  shop: 'У меня интернет-магазин одежды. Бот помогает подобрать размер, отвечает на вопросы о наличии, доставке и возврате.',
+  custom: 'Расскажи о своём бизнесе подробно...',
+};
+
+function useTemplate(type) {
+  const text = TEMPLATES[type];
+  if ($('con-input')) {
+    $('con-input').value = text;
+    if (type !== 'custom') sendConstructorMsg();
+    else $('con-input').focus();
+  }
+}
+
+// ── Token Stats ───────────────────────────────────────────────────────────────
+function fmtTokens(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(2)+'M';
+  if (n >= 1_000)     return (n/1_000).toFixed(1)+'K';
+  return n.toString();
+}
+
+async function loadTokenStats() {
+  try {
+    const data = await railwayFetch('/api/tokens');
+    if (!data) return;
+
+    if($('tok-today'))      $('tok-today').textContent      = fmtTokens(data.today?.total);
+    if($('tok-today-cost')) $('tok-today-cost').textContent = `$${data.today?.cost_usd || '0.0000'}`;
+    if($('tok-month'))      $('tok-month').textContent      = fmtTokens(data.month?.total);
+    if($('tok-month-cost')) $('tok-month-cost').textContent = `$${data.month?.cost_usd || '0.00'} этот месяц`;
+    if($('tok-calls'))      $('tok-calls').textContent      = data.total?.calls || 0;
+
+    const pct = data.limit?.used_pct || 0;
+    const bar = $('tok-progress-bar');
+    if(bar) {
+      bar.style.width = pct + '%';
+      bar.style.background = pct > 80 ? 'var(--danger)' : pct > 60 ? 'var(--warn)' : 'var(--accent)';
+    }
+    if($('tok-limit-pct'))      $('tok-limit-pct').textContent  = pct + '%';
+    if($('tok-limit-sub'))      $('tok-limit-sub').textContent  = `из ${fmtTokens(data.limit?.monthly_tokens)}`;
+    if($('tok-progress-label')) $('tok-progress-label').textContent =
+      `${fmtTokens(data.limit?.used_tokens)} / ${fmtTokens(data.limit?.monthly_tokens)}`;
+    if($('tok-limit-input'))    $('tok-limit-input').placeholder = data.limit?.monthly_tokens || 1000000;
+
+    addLog(`✓ Токены: сегодня ${fmtTokens(data.today?.total)} · месяц $${data.month?.cost_usd}`, 'linf');
+  } catch(e) {
+    addLog(`⚠ Токены: ${e.message}`, 'lwarn');
+  }
+}
+
+async function setTokenLimit() {
+  const val = parseInt($('tok-limit-input')?.value);
+  if (!val || val < 1000) { toast('Введи лимит (минимум 1000)','warn'); return; }
+  try {
+    await railwayFetch('/api/tokens/limit', { method:'POST', body: JSON.stringify({ limit: val }) });
+    toast(`Лимит установлен: ${fmtTokens(val)} токенов/мес`);
+    loadTokenStats();
+  } catch(e) { toast('Railway: '+e.message,'err'); }
+}
+
+// Загружаем токены вместе с дашбордом
+const _origInit = init;
+window.init = function() {
+  _origInit();
+  setTimeout(loadTokenStats, 2000);
+};
+
+// ── Learning System ───────────────────────────────────────────────────────────
+let _selectedRating = null;
+
+function selectRating(r) {
+  _selectedRating = r;
+  const pos = $('btn-pos'), neg = $('btn-neg');
+  if (r === 'positive') {
+    pos.style.cssText = 'flex:1;justify-content:center;background:rgba(37,211,102,.25);color:var(--accent);border:2px solid var(--accent);';
+    neg.style.cssText = 'flex:1;justify-content:center;background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3);';
+  } else {
+    neg.style.cssText = 'flex:1;justify-content:center;background:rgba(239,68,68,.25);color:var(--danger);border:2px solid var(--danger);';
+    pos.style.cssText = 'flex:1;justify-content:center;background:rgba(37,211,102,.1);color:var(--accent);border:1px solid rgba(37,211,102,.3);';
+  }
+}
+
+async function submitFeedback() {
+  if (!_selectedRating) { toast('Выбери оценку — ✅ или ❌','warn'); return; }
+  const comment = $('fb-comment')?.value?.trim();
+  if (!comment) { toast('Напиши объяснение','warn'); return; }
+  try {
+    await railwayFetch('/api/feedback', {
+      method: 'POST',
+      body: JSON.stringify({
+        chatId:  $('fb-chatid')?.value?.trim() || 'manual',
+        rating:  _selectedRating,
+        comment,
+        example: $('fb-example')?.value?.trim() || '',
+      }),
+    });
+    toast(_selectedRating === 'positive' ? '✅ Оценка сохранена — бот учится!' : '❌ Ошибка зафиксирована — бот не повторит!');
+    addLog(`✓ Feedback [${_selectedRating}]: "${comment.slice(0,50)}"`, 'lfb');
+    $('fb-comment').value = '';
+    $('fb-example').value = '';
+    $('fb-chatid').value  = '';
+    _selectedRating = null;
+    if($('btn-pos'))$('btn-pos').style.cssText='flex:1;justify-content:center;background:rgba(37,211,102,.1);color:var(--accent);border:1px solid rgba(37,211,102,.3);';
+    if($('btn-neg'))$('btn-neg').style.cssText='flex:1;justify-content:center;background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3);';
+    loadFeedbackList();
+    loadFeedbackStats();
+  } catch(e) { toast('Railway: '+e.message,'err'); }
+}
+
+async function loadFeedbackList() {
+  const el = $('feedback-list'); if(!el) return;
+  try {
+    const data = await railwayFetch('/api/feedback?limit=20');
+    if (!data.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px 0;">Оценок пока нет</div>'; return; }
+    el.innerHTML = data.map(f => `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="font-size:18px;flex-shrink:0;">${f.rating==='positive'?'✅':'❌'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13.5px;font-weight:600;color:var(--color-text-primary);">${f.comment||'—'}</div>
+          ${f.example?`<div style="font-size:12px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace;">"${f.example}"</div>`:''}
+          <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">${f.chatId||''} · ${fmtTime(f.createdAt)}</div>
+        </div>
+        <button onclick="deleteFeedback('${f.id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;padding:4px;flex-shrink:0;">×</button>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи Railway URL</div>`;
+  }
+}
+
+async function deleteFeedback(id) {
+  try {
+    await railwayFetch(`/api/feedback/${id}`, { method:'DELETE' });
+    toast('Оценка удалена','info');
+    loadFeedbackList();
+    loadFeedbackStats();
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadFeedbackStats() {
+  try {
+    const data = await railwayFetch('/api/stats');
+    if($('fb-total'))$('fb-total').textContent = data.feedback_total||0;
+    if($('fb-pos'))$('fb-pos').textContent     = data.feedback_positive||0;
+    if($('fb-neg'))$('fb-neg').textContent     = data.feedback_negative||0;
+    if($('nav-feedback-cnt'))$('nav-feedback-cnt').textContent = data.feedback_total||0;
+  } catch(e) { /* тихо */ }
+}
+
+async function loadErrorPatterns() {
+  const el = $('error-patterns-list'); if(!el) return;
+  try {
+    const data = await railwayFetch('/api/error-patterns');
+    if (!data.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ошибок не обнаружено</div>'; return; }
+    el.innerHTML = data.map(p => `
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,.12);color:var(--warn);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">${p.count}</div>
+        <div style="flex:1;font-size:13px;">${p.description}</div>
+        <button onclick="deletePattern('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;">×</button>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи Railway URL</div>`;
+  }
+}
+
+async function deletePattern(id) {
+  try { await railwayFetch(`/api/error-patterns/${id}`,{method:'DELETE'}); toast('Паттерн сброшен'); loadErrorPatterns(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+async function previewPrompt() {
+  const card = $('prompt-preview-card');
+  const pre  = $('prompt-preview-text');
+  try {
+    const data = await railwayFetch('/api/prompt-preview');
+    pre.textContent = data.prompt;
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
+    toast(`Промпт: ${data.length} символов`,'info');
+  } catch(e) { toast('Railway: '+e.message,'err'); }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ОТЧЁТНОСТЬ
+// ══════════════════════════════════════════════════════════
+
+// Загружаем Chart.js динамически
+function loadChartJs(cb) {
+  if (window.Chart) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+let _repData = null;
+let _repChartDays = null;
+let _repChartProducts = null;
+let _repChartTokens = null;
+let _repAllEvents = [];
+
+function setRepPeriod(days) {
+  const to = new Date();
+  const from = new Date(); from.setDate(from.getDate() - (days - 1));
+  const fmt = d => d.toISOString().slice(0, 10);
+  const f = $('rep-from'), t = $('rep-to');
+  if (f) f.value = fmt(from);
+  if (t) t.value = fmt(to);
+  loadReports();
+}
+
+function initRepDates() {
+  const today = new Date().toISOString().slice(0, 10);
+  const from30 = new Date(); from30.setDate(from30.getDate() - 29);
+  const f = $('rep-from'), t = $('rep-to');
+  if (f && !f.value) f.value = from30.toISOString().slice(0, 10);
+  if (t && !t.value) t.value = today;
+}
+
+async function loadReports() {
+  const from = $('rep-from')?.value;
+  const to   = $('rep-to')?.value;
+  if (!from || !to) { toast('Укажи даты', 'warn'); return; }
+
+  try {
+    const data = await railwayFetch(`/api/reports?from=${from}&to=${to}`);
+    _repData = data;
+    renderRepKPI(data);
+    loadChartJs(() => {
+      renderRepChartDays(data);
+      renderRepChartProducts(data);
+      renderRepChartTokens(data);
+      renderLeadsDaysChart(data);
+      renderMeasDaysChart(data);
+      renderShowDaysChart(data);
+      renderMediaChart(data);
+    });
+    renderRepFunnel(data);
+    renderRepTopDialogs(data);
+    renderRepEvents(data);
+    addLog(`↺ Отчёт загружен: ${from} → ${to}`, 'linf');
+  } catch(e) {
+    toast('Railway: ' + e.message, 'err');
+  }
+}
+
+async function loadReportDay() {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const data = await railwayFetch(`/api/reports/${today}`);
+    _repAllEvents = data.events || [];
+    filterRepEvents();
+  } catch(e) {
+    toast(e.message, 'err');
+  }
+}
+
+function switchRepTab(tab) {
+  const tabs = ['main','leads','meas','show','media','conv'];
+  tabs.forEach(t => {
+    const btn = $('rtab-' + t);
+    const panel = $('reptab-' + t);
+    if (btn) btn.className = 'btn ' + (t === tab ? 'btn-p' : 'btn-g') + ' ' + btn.className.split(' ').slice(2).join(' ');
+    if (t === tab) { btn.style.cssText = 'font-size:12px;padding:6px 14px;background:var(--accent);color:#000;border:none;'; }
+    else { btn.style.cssText = 'font-size:12px;padding:6px 14px;'; btn.className = 'btn btn-g'; }
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+  });
+  // Show/hide main charts
+  const mc = $('rep-main-charts');
+  if (mc) mc.style.display = tab === 'main' ? '' : 'none';
+}
+
+function renderRepKPI(data) {
+  const set = (id, val) => { const el = $(id); if (el) el.textContent = val != null ? val : '—'; };
+
+  // Main tab
+  set('rep-msgs-in',   data.totals?.message_in   || 0);
+  set('rep-msgs-out',  data.totals?.message_out  || 0);
+  set('rep-leads',     data.leadsTotal            || 0);
+  set('rep-hot',       (data.leadsHot || 0) + (data.leadsWarm || 0));
+  set('rep-measures',  data.measuresTotal || 0);
+  set('rep-showroom',  data.showroomTotal || 0);
+  set('rep-escalated', data.leadsEscalated || 0);
+  set('rep-followup',  data.followUpSent || 0);
+  set('rep-night',     data.nightTotal || 0);
+  set('rep-refused',   data.refusedTotal || 0);
+  set('rep-photos',    data.photoTotal || 0);
+  const msgs  = data.totals?.message_in || 0;
+  const leads = data.leadsTotal || 0;
+  const conv  = msgs > 0 ? Math.round((leads / msgs) * 100) + '%' : '—';
+  set('rep-conv', conv);
+
+  // Leads tab
+  set('rep2-total', data.leadsTotal || 0);
+  set('rep2-hot',   data.leadsHot   || 0);
+  set('rep2-warm',  data.leadsWarm  || 0);
+  set('rep2-cold',  data.leadsCold  || 0);
+
+  // Measures tab
+  set('rep3-measures', data.measuresTotal || 0);
+  set('rep3-escm',     data.leadsEscalated || 0);
+  const mPct = data.leadsHot > 0 ? Math.round((data.measuresTotal || 0) / data.leadsHot * 100) + '%' : '—';
+  set('rep3-pct', mPct);
+
+  // Showroom tab
+  set('rep4-total', data.showroomTotal || 0);
+  const sPct = leads > 0 ? Math.round((data.showroomTotal || 0) / leads * 100) + '%' : '—';
+  set('rep4-pct', sPct);
+  set('rep4-fu', data.followUpSent || 0);
+
+  // Media tab
+  set('rep5-photos',  data.photoTotal || 0);
+  set('rep5-voice',   data.voiceTotal || 0);
+  set('rep5-night',   data.nightTotal || 0);
+  set('rep5-refused', data.refusedTotal || 0);
+
+  // Render measures list
+  renderMeasuresList(data);
+  // Render showroom list
+  renderShowroomList(data);
+  // Render media chart
+  loadChartJs(() => renderMediaChart(data));
+  // Render leads-by-day chart for leads tab
+  loadChartJs(() => renderLeadsDaysChart(data));
+}
+
+function renderMeasuresList(data) {
+  const el = $('rep-meas-list'); if (!el) return;
+  const events = [];
+  for (const day of (data.days || [])) {
+    for (const ev of (day.events || [])) {
+      if (ev.type === 'lead_saved' && ev.construction) events.push({ ...ev, _day: day.day });
+    }
+  }
+  if (!events.length) { el.innerHTML = '<div style="color:var(--muted);padding:12px;font-size:13px;">Замеров нет за период</div>'; return; }
+  el.innerHTML = events.slice(0, 100).map(ev => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(96,165,250,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📐</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;">${ev.construction || 'Конструкция не указана'}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">${ev.chatId?.replace('@c.us','') || '—'} · ${fmtTime(ev.ts)}</div>
+      </div>
+      <span class="b ${ev.stage==='горячий'?'b-r':ev.stage==='тёплый'?'b-y':'b-b'}">${ev.stage || '—'}</span>
+    </div>`).join('');
+}
+
+function renderShowroomList(data) {
+  const el = $('rep-show-list'); if (!el) return;
+  const events = [];
+  for (const day of (data.days || [])) {
+    for (const ev of (day.events || [])) {
+      if (ev.type === 'showroom_booked') events.push({ ...ev, _day: day.day });
+    }
+  }
+  if (!events.length) { el.innerHTML = '<div style="color:var(--muted);padding:12px;font-size:13px;">Записей в шоурум нет за период</div>'; return; }
+  el.innerHTML = events.slice(0, 100).map(ev => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(45,212,191,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏠</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;">${ev.name || 'Клиент'}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">🕐 ${ev.time || '—'} · ${ev.chatId?.replace('@c.us','') || ''}</div>
+        <div style="font-size:11px;color:var(--teal);margin-top:1px;">${fmtTime(ev.ts)}</div>
+      </div>
+      <span class="b b-t">Шоурум</span>
+    </div>`).join('');
+}
+
+function renderMediaChart(data) {
+  const ctx = document.getElementById('rep-chart-media'); if (!ctx) return;
+  if (window._repChartMedia) { window._repChartMedia.destroy(); }
+
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+    allDays.push(d.toISOString().slice(0, 10));
+  }
+  const photos = allDays.map(d => data.days.find(x => x.day === d)?.counters?.image_message || 0);
+  const voice  = allDays.map(d => data.days.find(x => x.day === d)?.counters?.voice_message || 0);
+  const nights = allDays.map(d => data.days.find(x => x.day === d)?.counters?.night_message || 0);
+
+  window._repChartMedia = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allDays.map(d => d.slice(5)),
+      datasets: [
+        { label: '📸 Фото', data: photos, backgroundColor: 'rgba(96,165,250,0.4)', borderColor: '#60a5fa', borderWidth: 1.5, borderRadius: 4 },
+        { label: '🎙 Голос', data: voice,  backgroundColor: 'rgba(167,139,250,0.4)', borderColor: '#a78bfa', borderWidth: 1.5, borderRadius: 4 },
+        { label: '🌙 Ночные', data: nights, backgroundColor: 'rgba(107,114,128,0.4)', borderColor: '#6b7280', borderWidth: 1.5, borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function renderLeadsDaysChart(data) {
+  const ctx = document.getElementById('rep-chart-leads-days'); if (!ctx) return;
+  if (window._repChartLeadsDays) { window._repChartLeadsDays.destroy(); }
+
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+    allDays.push(d.toISOString().slice(0, 10));
+  }
+  const hot  = allDays.map(d => data.leadsByDay[d]?.hot  || 0);
+  const warm = allDays.map(d => data.leadsByDay[d]?.warm || 0);
+  const cold = allDays.map(d => data.leadsByDay[d]?.cold || 0);
+  const meas = allDays.map(d => data.measureByDay[d]    || 0);
+  const show = allDays.map(d => data.showroomByDay[d]   || 0);
+
+  window._repChartLeadsDays = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allDays.map(d => d.slice(5)),
+      datasets: [
+        { label: '🔥 Горячих', data: hot,  backgroundColor: 'rgba(239,68,68,0.5)',   borderColor: '#ef4444', borderWidth: 1.5, borderRadius: 4 },
+        { label: '🌡 Тёплых',  data: warm, backgroundColor: 'rgba(245,158,11,0.5)',  borderColor: '#f59e0b', borderWidth: 1.5, borderRadius: 4 },
+        { label: '❄️ Холодных', data: cold, backgroundColor: 'rgba(96,165,250,0.35)', borderColor: '#60a5fa', borderWidth: 1.5, borderRadius: 4 },
+        { label: '📐 Замеры',  data: meas, backgroundColor: 'rgba(45,212,191,0.4)',  borderColor: '#2dd4bf', borderWidth: 1.5, borderRadius: 4 },
+        { label: '🏠 Шоурум',  data: show, backgroundColor: 'rgba(167,139,250,0.4)', borderColor: '#a78bfa', borderWidth: 1.5, borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } },
+      scales: {
+        x: { stacked: false, ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function renderMeasDaysChart(data) {
+  const ctx = document.getElementById('rep-chart-meas-days'); if (!ctx) return;
+  if (window._repChartMeas) { window._repChartMeas.destroy(); }
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) allDays.push(d.toISOString().slice(0,10));
+  window._repChartMeas = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allDays.map(d => d.slice(5)),
+      datasets: [{ label: '📐 Запросов замера', data: allDays.map(d => data.measureByDay[d]||0), backgroundColor: 'rgba(96,165,250,0.4)', borderColor: '#60a5fa', borderWidth: 1.5, borderRadius: 4 }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true } } },
+  });
+}
+
+function renderShowDaysChart(data) {
+  const ctx = document.getElementById('rep-chart-show-days'); if (!ctx) return;
+  if (window._repChartShow) { window._repChartShow.destroy(); }
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) allDays.push(d.toISOString().slice(0,10));
+  window._repChartShow = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allDays.map(d => d.slice(5)),
+      datasets: [{ label: '🏠 Встреч в шоуруме', data: allDays.map(d => data.showroomByDay[d]||0), backgroundColor: 'rgba(45,212,191,0.4)', borderColor: '#2dd4bf', borderWidth: 1.5, borderRadius: 4 }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true } } },
+  });
+}
+
+function renderRepChartDays(data) {
+  const ctx = document.getElementById('rep-chart-days');
+  if (!ctx) return;
+  if (_repChartDays) { _repChartDays.destroy(); _repChartDays = null; }
+
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+    allDays.push(d.toISOString().slice(0, 10));
+  }
+
+  const msgs   = allDays.map(d => data.days.find(x => x.day === d)?.counters?.message_in || 0);
+  const leads  = allDays.map(d => (data.leadsByDay[d]?.total) || 0);
+
+  _repChartDays = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: allDays.map(d => d.slice(5)),
+      datasets: [
+        { label: 'Сообщения', data: msgs, backgroundColor: 'rgba(37,211,102,0.35)', borderColor: '#25d366', borderWidth: 1.5, borderRadius: 4 },
+        { label: 'Лиды', data: leads, backgroundColor: 'rgba(239,68,68,0.35)', borderColor: '#ef4444', borderWidth: 1.5, borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6b7280', font: { size: 10 }, maxRotation: 45 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#6b7280', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function renderRepChartProducts(data) {
+  const ctx = document.getElementById('rep-chart-products');
+  if (!ctx) return;
+  if (_repChartProducts) { _repChartProducts.destroy(); _repChartProducts = null; }
+
+  const entries = Object.entries(data.byConstruction || {}).sort((a,b) => b[1] - a[1]).slice(0, 8);
+  if (!entries.length) return;
+
+  const colors = ['#25d366','#60a5fa','#f59e0b','#ef4444','#a78bfa','#2dd4bf','#fb923c','#e879f9'];
+  _repChartProducts = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(([k]) => k.length > 20 ? k.slice(0, 18) + '…' : k),
+      datasets: [{ data: entries.map(([,v]) => v), backgroundColor: colors, borderWidth: 0 }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#6b7280', font: { size: 11 }, boxWidth: 12 } },
+      },
+    },
+  });
+}
+
+function renderRepChartTokens(data) {
+  const ctx = document.getElementById('rep-chart-tokens');
+  if (!ctx) return;
+  if (_repChartTokens) { _repChartTokens.destroy(); _repChartTokens = null; }
+
+  const tokenByDay = data.tokenByDay || {};
+  const days = Object.keys(tokenByDay).sort();
+  if (!days.length) return;
+
+  const inp = days.map(d => tokenByDay[d]?.input_tokens || 0);
+  const out = days.map(d => tokenByDay[d]?.output_tokens || 0);
+
+  _repChartTokens = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days.map(d => d.slice(5)),
+      datasets: [
+        { label: 'Input', data: inp, borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.3, fill: true, pointRadius: 3 },
+        { label: 'Output', data: out, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.1)', tension: 0.3, fill: true, pointRadius: 3 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#6b7280', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function renderRepFunnel(data) {
+  const el = $('rep-funnel'); if (!el) return;
+  const total = data.leadsTotal || 1;
+  const stages = [
+    { label: 'Всего лидов',        val: data.leadsTotal || 0,     color: '#60a5fa', pct: 100 },
+    { label: '🔥 Горячих',         val: data.leadsHot || 0,       color: '#ef4444', pct: Math.round(((data.leadsHot||0)/total)*100) },
+    { label: '🌡 Тёплых',          val: data.leadsWarm || 0,      color: '#f59e0b', pct: Math.round(((data.leadsWarm||0)/total)*100) },
+    { label: '❄️ Холодных',        val: data.leadsCold || 0,      color: '#6b7280', pct: Math.round(((data.leadsCold||0)/total)*100) },
+    { label: '📞 Передано менеджеру', val: data.leadsEscalated||0, color: '#f59e0b', pct: Math.round(((data.leadsEscalated||0)/total)*100) },
+    { label: '🏠 Шоурум записей',  val: data.totals?.showroom_booked||0, color: '#2dd4bf', pct: Math.round(((data.totals?.showroom_booked||0)/total)*100) },
+  ];
+  el.innerHTML = stages.map(s => `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">
+        <span style="color:var(--text)">${s.label}</span>
+        <span style="font-weight:700;color:${s.color}">${s.val} <span style="font-weight:400;color:var(--muted)">(${s.pct}%)</span></span>
+      </div>
+      <div style="height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${s.pct}%;background:${s.color};border-radius:4px;transition:width .4s;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRepTopDialogs(data) {
+  const tbody = document.querySelector('#rep-top-dialogs tbody');
+  if (!tbody) return;
+  const dialogs = data.topDialogs || [];
+  if (!dialogs.length) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px;">Нет данных</td></tr>'; return; }
+  tbody.innerHTML = dialogs.map((d, i) => `
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td class="lp">${d.name}</td>
+      <td style="font-weight:700;">${d.messageCount}</td>
+      <td style="color:var(--muted);font-size:11.5px;">${fmtTime(d.lastActivity)}</td>
+      <td><span class="b ${d.stage === 'горячий' ? 'b-r' : d.stage === 'тёплый' ? 'b-y' : 'b-b'}">${d.stage || 'активный'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderRepEvents(data) {
+  _repAllEvents = [];
+  for (const day of (data.days || [])) {
+    for (const ev of (day.events || [])) {
+      _repAllEvents.push({ ...ev, _day: day.day });
+    }
+  }
+  _repAllEvents.sort((a, b) => b.ts - a.ts);
+  filterRepEvents();
+}
+
+function filterRepEvents() {
+  const filter = $('rep-event-filter')?.value || '';
+  const el = $('rep-events-list'); if (!el) return;
+
+  const filtered = filter ? _repAllEvents.filter(e => e.type === filter) : _repAllEvents;
+  const show = filtered.slice(0, 200);
+
+  if (!show.length) {
+    el.innerHTML = '<div style="color:var(--muted);padding:12px 0;">Событий нет</div>';
+    return;
+  }
+
+  const TYPE_ICON = {
+    message_in:     { icon: '↓', cls: 'linf',  label: 'Входящее' },
+    message_out:    { icon: '↑', cls: 'lok',   label: 'Ответ' },
+    lead_saved:     { icon: '★', cls: 'lwarn', label: 'Лид' },
+    escalated:      { icon: '!', cls: 'lerr',  label: 'Эскалация' },
+    showroom_booked:{ icon: '🏠', cls: 'lfb',  label: 'Шоурум' },
+  };
+
+  el.innerHTML = show.map(ev => {
+    const cfg = TYPE_ICON[ev.type] || { icon: '·', cls: 'lt2', label: ev.type };
+    const time = new Date(ev.ts).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const date = new Date(ev.ts).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' });
+    const extra = ev.stage ? ` · <span style="color:${ev.stage==='горячий'?'#ef4444':ev.stage==='тёплый'?'#f59e0b':'#6b7280'}">${ev.stage}</span>` : '';
+    const tokens = ev.tokens_in ? ` · <span style="color:var(--muted)">${ev.tokens_in}in/${ev.tokens_out}out</span>` : '';
+    const phone  = ev.chatId ? ` <span style="color:var(--muted)">${ev.chatId.replace('@c.us','')}</span>` : '';
+    const product = ev.construction ? ` <span style="color:var(--purple)">${ev.construction}</span>` : '';
+    return `<span class="ll"><span class="lt2">${date} ${time}</span> <span class="${cfg.cls}">[${cfg.label}]</span>${phone}${product}${extra}${tokens}</span>`;
+  }).join('');
+}
+
+function exportReportCSV() {
+  if (!_repData) { toast('Сначала загрузи отчёт', 'warn'); return; }
+  const rows = [['День', 'Входящих', 'Ответов', 'Лиды всего', 'Горячих', 'Тёплых', 'Холодных', 'Эскалаций', 'Шоурум']];
+  const allDays = [];
+  const from = new Date($('rep-from').value);
+  const to   = new Date($('rep-to').value);
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+    allDays.push(d.toISOString().slice(0, 10));
+  }
+  for (const day of allDays) {
+    const dc = _repData.days.find(x => x.day === day)?.counters || {};
+    const lc = _repData.leadsByDay[day] || {};
+    rows.push([day, dc.message_in||0, dc.message_out||0, lc.total||0, lc.hot||0, lc.warm||0, lc.cold||0, lc.escalated||0, lc.showroom||0]);
+  }
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = `igs-bot-report-${$('rep-from').value}-${$('rep-to').value}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('CSV скачан', 'info');
+}
+
+// Hook into go() to load reports when tab opens
+// Загружаем данные при открытии раздела обучения
+const _origGo = go;
+window.go = function(name, btn) {
+  _origGo(name, btn);
+  if (name === 'learning') {
+    loadFeedbackList();
+    loadFeedbackStats();
+    loadErrorPatterns();
+  }
+  if (name === 'reports') {
+    initRepDates();
+    loadReports();
+  }
+};
+
+// Кнопка оценки в разделе диалогов — устанавливаем chatId автоматически
+function openDialogWithFeedback(chatId, el) {
+  openDialog(chatId, el);
+  if($('fb-chatid')) $('fb-chatid').value = chatId;
+}
+
+init();
+</script>
+</body>
+</html>
