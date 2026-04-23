@@ -207,12 +207,17 @@ select option{background:#fff;}
 
   // VPS URL — на Vercel используем /bot-api через rewrites (обход Mixed Content HTTPS→HTTP).
   // На dev (file:// или localhost) — прямой адрес.
+  // ВАЖНО: если страница на HTTPS, НИКОГДА не возвращаем http:// URL (браузер заблокирует).
   function getVpsUrl(){
-    const override = localStorage.getItem('igs_railway_url');
-    if (override && override.trim()) return override.replace(/\/$/,'');
-    // Автовыбор: если на Vercel (HTTPS) — прокси, иначе напрямую
     const isHttps = location.protocol === 'https:';
-    return isHttps ? '/bot-api' : 'http://45.136.58.180:3001';
+    const override = (localStorage.getItem('igs_railway_url') || '').trim().replace(/\/$/,'');
+    if (isHttps) {
+      // На HTTPS игнорируем HTTP-override из localStorage — только HTTPS или прокси /bot-api
+      if (override && override.startsWith('https://')) return override;
+      return '/bot-api';
+    }
+    if (override) return override;
+    return 'http://45.136.58.180:3001';
   }
 
   // ── Supabase: загрузка заявок (прямой HTTPS → Supabase) ──
@@ -1004,9 +1009,14 @@ function setFb(ok){
 
 // ── Railway API ───────────────────────────────────────────────────────────────
 function getRailwayUrl(){
-  const override = localStorage.getItem('igs_railway_url');
-  if (override && override.trim()) return override.replace(/\/$/,'');
-  return location.protocol === 'https:' ? '/bot-api' : 'http://45.136.58.180:3001';
+  const isHttps = location.protocol === 'https:';
+  const override = (localStorage.getItem('igs_railway_url') || '').trim().replace(/\/$/,'');
+  if (isHttps) {
+    if (override && override.startsWith('https://')) return override;
+    return '/bot-api';
+  }
+  if (override) return override;
+  return 'http://45.136.58.180:3001';
 }
 function saveRailwayUrl(){
   const val = $('railway-url')?.value||'';
@@ -1527,9 +1537,14 @@ async function init(){
   applyState('active');
 
   // Восстанавливаем сохранённые значения
-  const railUrl = localStorage.getItem('igs_railway_url') || 'http://45.136.58.180:3001';
+  // Чистим HTTP-override из localStorage на HTTPS странице (Mixed Content)
+  const isHttps = location.protocol === 'https:';
+  const stored = (localStorage.getItem('igs_railway_url') || '').trim();
+  if (isHttps && stored.startsWith('http://')) {
+    localStorage.removeItem('igs_railway_url');
+  }
+  const railUrl = getRailwayUrl();
   if($('railway-url')) $('railway-url').value = railUrl;
-  if(railUrl) localStorage.setItem('igs_railway_url', railUrl);
 
   const key = localStorage.getItem('igs_claude_key') || '';
   if($('claude-key-local')) $('claude-key-local').value = key;
