@@ -7,21 +7,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0e0f11;--bg2:#16181c;--bg3:#1e2026;--bg4:#252830;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#f0f0f0;--muted:#6b7280;
-  --accent:#25d366;--accent-glow:rgba(37,211,102,0.15);
-  --danger:#ef4444;--warn:#f59e0b;--info:#60a5fa;
-  --purple:#a78bfa;--purple-glow:rgba(167,139,250,0.15);
-  --teal:#2dd4bf;--teal-glow:rgba(45,212,191,0.15);
+  --bg:#f0f4f8;--bg2:#ffffff;--bg3:#e8edf2;--bg4:#dce3eb;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a2332;--muted:#64748b;
+  --accent:#2563eb;--accent-glow:rgba(37,99,235,0.1);
+  --danger:#ef4444;--warn:#f59e0b;--info:#3b82f6;
+  --purple:#7c3aed;--purple-glow:rgba(124,58,237,0.1);
+  --teal:#0891b2;--teal-glow:rgba(8,145,178,0.1);
+  --green:#16a34a;
   --radius:12px;--radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;}
 .shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh;}
-.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:2px 0 8px rgba(0,0,0,0.04);}
 .logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);}
-.logo-mark{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;box-shadow:0 2px 8px rgba(37,99,235,0.3);}
 .logo-mark svg{width:18px;height:18px;}
 .logo-title{font-size:13.5px;font-weight:700;}
 .logo-sub{font-size:11px;color:var(--muted);margin-top:1px;}
@@ -34,14 +35,14 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min
 .ni svg{width:15px;height:15px;flex-shrink:0;}
 .ni-badge{margin-left:auto;padding:1px 7px;border-radius:20px;font-size:10.5px;font-weight:700;}
 .sdot{width:6px;height:6px;border-radius:50%;background:var(--muted);margin-left:auto;flex-shrink:0;}
-.sdot.on{background:var(--accent);box-shadow:0 0 5px var(--accent);animation:pulse 2s infinite;}
+.sdot.on{background:var(--green);box-shadow:0 0 5px var(--green);animation:pulse 2s infinite;}
 .sdot.off{background:var(--danger);}
 .sdot.pause{background:var(--warn);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .sf{padding:14px 18px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted);}
 .fb-row{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;}
 .fb-dot{width:5px;height:5px;border-radius:50%;background:var(--danger);}
-.fb-dot.on{background:var(--accent);box-shadow:0 0 4px var(--accent);}
+.fb-dot.on{background:var(--green);box-shadow:0 0 4px var(--green);}
 .main{padding:32px 36px;overflow-y:auto;}
 .page{display:none;}
 .page.active{display:block;animation:fi .18s ease;}
@@ -49,7 +50,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min
 .ph{margin-bottom:24px;}
 .ph-title{font-size:21px;font-weight:700;margin-bottom:3px;}
 .ph-sub{font-size:13px;color:var(--muted);}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
 .ct{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
 .ct svg{width:13px;height:13px;}
 label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
@@ -60,13 +61,13 @@ textarea{resize:vertical;min-height:180px;line-height:1.65;}
 .field{margin-bottom:16px;}
 .fhint{font-size:11.5px;color:var(--muted);margin-top:4px;}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-select option{background:#1e2026;}
+select option{background:#fff;}
 .ccount{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;}
 .divider{height:1px;background:var(--border);margin:18px 0;}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
 .btn svg{width:14px;height:14px;}
-.btn-p{background:var(--accent);color:#000;}
-.btn-p:hover{background:#1fbe5a;}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:#1d4ed8;}
 .btn-g{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
 .btn-g:hover{border-color:var(--border2);}
 .btn-d{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
@@ -77,7 +78,7 @@ select option{background:#1e2026;}
 .btn-teal{background:var(--teal-glow);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
 .brow{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap;}
 .sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
-.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
 .sc-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
 .sc-val{font-size:26px;font-weight:700;line-height:1;}
 .sc-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
@@ -91,7 +92,7 @@ select option{background:#1e2026;}
 .bn{font-size:14.5px;font-weight:700;}
 .bs{font-size:12.5px;color:var(--muted);margin-top:2px;}
 .b{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
-.b-g{background:rgba(37,211,102,.12);color:var(--accent);}
+.b-g{background:rgba(22,163,74,.1);color:var(--green);}
 .b-r{background:rgba(239,68,68,.12);color:var(--danger);}
 .b-y{background:rgba(245,158,11,.12);color:var(--warn);}
 .b-b{background:rgba(96,165,250,.12);color:var(--info);}
@@ -106,7 +107,7 @@ select option{background:#1e2026;}
 .tog input{opacity:0;width:0;height:0;}
 .ts-{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:.2s;}
 .ts-::before{content:'';position:absolute;width:13px;height:13px;left:3px;top:50%;transform:translateY(-50%);background:var(--muted);border-radius:50%;transition:.2s;}
-.tog input:checked+.ts-{background:var(--accent-glow);border-color:var(--accent);}
+.tog input:checked+.ts-{background:rgba(37,99,235,.15);border-color:var(--accent);}
 .tog input:checked+.ts-::before{transform:translate(17px,-50%);background:var(--accent);}
 .fc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;}
 .fc.enabled{border-left:3px solid var(--accent);}
@@ -135,7 +136,7 @@ select option{background:#1e2026;}
 .chat-sub{font-size:11.5px;color:var(--muted);}
 .chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
 .msg{max-width:75%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;}
-.msg.user{background:var(--accent);color:#000;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
 .msg.bot{background:var(--bg3);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;}
 .msg.system{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple);font-size:11.5px;align-self:center;text-align:center;max-width:90%;border-radius:8px;}
 .msg.typing{background:var(--bg3);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;color:var(--muted);}
@@ -155,7 +156,7 @@ select option{background:#1e2026;}
 .di-name{font-size:13px;font-weight:600;display:flex;justify-content:space-between;}
 .di-last{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
 .di-time{font-size:10.5px;color:var(--muted);}
-.log-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;height:240px;overflow-y:auto;line-height:1.9;}
+.log-box{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;height:240px;overflow-y:auto;line-height:1.9;}
 .ll{display:block;}
 .lt2{color:var(--muted);margin-right:7px;}
 .lok{color:var(--accent);}
@@ -193,100 +194,146 @@ select option{background:#1e2026;}
 </head>
 <body>
 
-<!-- Supabase -->
-<script type="module">
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-const SUPA_URL='https://qglkajbaviutmxfwodui.supabase.co';
-const SUPA_KEY='sb_publishable_-d-LvsRXnVznPwDa0IQgVQ_6ngau3R3';
-const sb=createClient(SUPA_URL,SUPA_KEY);
+<!-- Supabase UMD (не модуль — грузится надёжнее) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase-js.min.js"></script>
+<script>
+(function(){
+  const SUPA_URL='https://qglkajbaviutmxfwodui.supabase.co';
+  // PUBLISHABLE (anon) key — read-only. Все политики allow_all читать публично.
+  // Запись идёт через /api/* endpoints бота с service_role на сервере.
+  const SUPA_KEY='sb_publishable_-d-LvsRXnVznPwDa0IQgVQ_6ngau3R3';
+  const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+  window._sb=sb;
 
-// Загружаем заявки из Supabase
-async function loadLeads(){
-  const{data}=await sb.from('bot_leads').select('*').order('created_at',{ascending:false}).limit(200);
-  if(!data)return;
-  const asObj={};data.forEach(l=>{asObj[l.id||l.chat_id||Date.now()]=l;});
-  window._fbLeads=asObj;
-  updateAll(asObj);
-  setFb(true);
-  addLog('↺ Supabase: заявки загружены','lfb');
-}
-loadLeads();
-setInterval(loadLeads,15000);
+  // VPS URL — всегда HTTPS через бот-домен или fallback на IP
+  function getVpsUrl(){ return (localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001').replace(/\/$/,''); }
 
-// Realtime заявки
-sb.channel('bot_leads').on('postgres_changes',{event:'*',schema:'public',table:'bot_leads'},()=>loadLeads()).subscribe();
-
-// Настройки бота — из API
-async function loadBotSettings(){
-  try{
-    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
-    const r=await fetch(railUrl+'/api/settings');
-    if(!r.ok)return;
-    const s=await r.json();
-    if(s.systemPrompt){const e=document.getElementById('system-prompt');if(e)e.value=s.systemPrompt;}
-    if(s.botName){const e=document.getElementById('bot-name');if(e)e.value=s.botName;}
-    updateCount();
-  }catch(e){}
-}
-loadBotSettings();
-
-// Статус бота — из /api/status
-async function loadBotStatus(){
-  try{
-    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
-    const r=await fetch(railUrl+'/health');
-    if(!r.ok)return;
-    const s=await r.json();
-    if(s.botState)applyState(s.botState);
-    const el=document.getElementById('bst');
-    if(el)el.textContent=s.waConnected?'Онлайн · WhatsApp подключён':'Оффлайн · WhatsApp не подключён';
-    const bt=document.getElementById('fb-bar-txt');
-    if(bt){bt.textContent='Supabase: подключено';bt.style.color='var(--green)';}
-    setFb(true);
-  }catch(e){
-    setFb(false);
-    const bt=document.getElementById('fb-bar-txt');
-    if(bt){bt.textContent='Нет связи с сервером';bt.style.color='var(--warn)';}
+  // ── Supabase: загрузка заявок (прямой HTTPS → Supabase) ──
+  // Маппер: БД bot_leads (lowercase) → ожидаемый UI-формат (CamelCase)
+  function mapLeadRow(l){
+    return {
+      id: l.id,
+      chatId: l.id,
+      Name: l.name || '',
+      phone: l.phone || '',
+      Construction_Type: l.construction_type || '',
+      Location: l.location || '',
+      Dimensions: l.dimensions || '',
+      Measurement_Date_Time: l.measurement_datetime || '',
+      Stage: l.stage || '',
+      stage: l.stage || '',
+      status: l.imported_to_crm ? 'done' : (l.stage === 'горячий' ? 'escalated' : 'new'),
+      messageCount: l.message_count || 0,
+      message_count: l.message_count || 0,
+      lastActivity: l.updated_at ? new Date(l.updated_at).getTime() : 0,
+      createdAt: l.created_at ? new Date(l.created_at).getTime() : 0,
+    };
   }
-}
-loadBotStatus();
-setInterval(loadBotStatus,10000);
-// Dialogs — читаем из бота (Supabase), не из Supabase
-async function loadDialogsFromBot(){
-  try{
-    const railUrl=localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
-    const r=await fetch(railUrl+'/api/dialogs');
-    if(!r.ok)return;
-    const arr=await r.json();
-    const mapped=arr.map(d=>({
-      id:d.id,
-      messageCount:d.message_count||0,
-      lastActivity:d.last_activity?new Date(d.last_activity).getTime():0,
-      participant_name:d.participant_name||'',
-      stage:d.stage||'',
-      paused:d.paused||false,
-    })).sort((a,b)=>(b.lastActivity||0)-(a.lastActivity||0));
-    renderDialogList(mapped);
-  }catch(e){console.warn('dialogs fetch:',e.message);}
-}
-loadDialogsFromBot();
-setInterval(loadDialogsFromBot,10000);
-// Замена window._fb → Supabase + бот API
-const _botUrl=()=>localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001';
-window._fb={
-  save:async(path,data)=>{
-    const url=_botUrl();
-    if(path==='bot_settings'||path==='functions'){
-      try{await fetch(url+'/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}
-    }else if(path==='bot_status'){
-      if(data?.state)try{await fetch(url+'/api/bot/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state:data.state})});}catch(e){}
+  async function loadLeads(){
+    try{
+      const{data,error}=await sb.from('bot_leads').select('*').order('created_at',{ascending:false}).limit(200);
+      if(error){console.error('[SUPA]',error);if(typeof setFb==='function')setFb(false);return;}
+      if(!data)return;
+      const asObj={};data.forEach(l=>{const m=mapLeadRow(l);asObj[m.id]=m;});
+      window._fbLeads=asObj;
+      if(typeof updateAll==='function')updateAll(asObj);
+      if(typeof setFb==='function')setFb(true);
+      if(typeof addLog==='function')addLog('↺ Supabase: '+data.length+' заявок','lfb');
+    }catch(e){
+      console.error('[SUPA] loadLeads:',e);
+      if(typeof setFb==='function')setFb(false);
     }
-  },
-  push:async(path,data)=>{
-    if(path==='leads'){await sb.from('bot_leads').insert({id:'test_'+Date.now(),name:data.Name||'',phone:data.phone||'',stage:data.Stage||'',construction_type:data.Construction_Type||'',location:data.Location||'',dimensions:data.Dimensions||'',measurement_datetime:data.Measurement_Date_Time||'',created_at:new Date().toISOString()});}
-  },
-  update:async()=>{},
-};
+  }
+  window._loadLeads=loadLeads;
+  // Ждём пока DOM и другие скрипты загрузятся
+  window.addEventListener('DOMContentLoaded',function(){
+    loadLeads();
+    setInterval(loadLeads,15000);
+    // Realtime
+    try{sb.channel('bot_leads').on('postgres_changes',{event:'*',schema:'public',table:'bot_leads'},()=>loadLeads()).subscribe();}catch(e){}
+  });
+
+  // ── VPS: настройки бота ──
+  async function loadBotSettings(){
+    try{
+      const r=await fetch(getVpsUrl()+'/api/settings');
+      if(!r.ok)return;
+      const s=await r.json();
+      if(s.systemPrompt){const e=document.getElementById('system-prompt');if(e)e.value=s.systemPrompt;}
+      if(s.botName){const e=document.getElementById('bot-name');if(e)e.value=s.botName;}
+      if(typeof updateCount==='function')updateCount();
+    }catch(e){console.warn('[VPS] settings:',e.message);}
+  }
+
+  // ── VPS: статус бота (ОТДЕЛЬНО от Supabase!) ──
+  async function loadBotStatus(){
+    try{
+      const r=await fetch(getVpsUrl()+'/health');
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const s=await r.json();
+      if(s.botState && typeof applyState==='function')applyState(s.botState);
+      const el=document.getElementById('bst');
+      if(el)el.textContent=s.waConnected?'Онлайн · WhatsApp подключён':'Инициализация...';
+      // VPS статус — отдельный индикатор (rail-dot/rail-txt)
+      const rd=document.getElementById('rail-dot');
+      const rt=document.getElementById('rail-txt');
+      if(rd)rd.className='fb-dot on';
+      if(rt)rt.textContent='VPS: OK · uptime '+s.uptime+'s';
+      const rbt=document.getElementById('railway-bar-txt');
+      if(rbt)rbt.textContent='VPS подключён · '+s.botState;
+    }catch(e){
+      console.warn('[VPS] health:',e.message);
+      const rd=document.getElementById('rail-dot');
+      const rt=document.getElementById('rail-txt');
+      if(rd)rd.className='fb-dot';
+      if(rt)rt.textContent='VPS: нет связи (mixed content?)';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded',function(){
+    setTimeout(loadBotSettings,500);
+    setTimeout(loadBotStatus,1000);
+    setInterval(loadBotStatus,10000);
+  });
+
+  // ── Диалоги ──
+  async function loadDialogsFromBot(){
+    try{
+      const r=await fetch(getVpsUrl()+'/api/dialogs');
+      if(!r.ok)return;
+      const arr=await r.json();
+      const mapped=arr.map(d=>({
+        id:d.id,
+        messageCount:d.message_count||0,
+        lastActivity:d.last_activity?new Date(d.last_activity).getTime():0,
+        participant_name:d.participant_name||'',
+        stage:d.stage||'',
+        paused:d.paused||false,
+      })).sort((a,b)=>(b.lastActivity||0)-(a.lastActivity||0));
+      if(typeof renderDialogList==='function')renderDialogList(mapped);
+    }catch(e){console.warn('[VPS] dialogs:',e.message);}
+  }
+  window.addEventListener('DOMContentLoaded',function(){
+    loadDialogsFromBot();
+    setInterval(loadDialogsFromBot,10000);
+  });
+
+  // ── window._fb API ──
+  window._fb={
+    save:async(path,data)=>{
+      const url=getVpsUrl();
+      if(path==='bot_settings'||path==='functions'){
+        try{await fetch(url+'/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){}
+      }else if(path==='bot_status'){
+        if(data?.state)try{await fetch(url+'/api/bot/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state:data.state})});}catch(e){}
+      }
+    },
+    push:async(path,data)=>{
+      if(path==='leads'){await sb.from('bot_leads').insert({id:'test_'+Date.now(),name:data.Name||'',phone:data.phone||'',stage:data.Stage||'',construction_type:data.Construction_Type||'',location:data.Location||'',dimensions:data.Dimensions||'',measurement_datetime:data.Measurement_Date_Time||'',created_at:new Date().toISOString()});}
+    },
+    update:async()=>{},
+  };
+})();
 </script>
 
 <div class="shell">
@@ -360,7 +407,7 @@ window._fb={
   <div class="sf">
     IGS Outdoor © 2025
     <div class="fb-row"><div class="fb-dot" id="fb-dot"></div><span id="fb-txt">Supabase: подключение...</span></div>
-    <div class="fb-row" style="margin-top:4px;"><div class="fb-dot" id="rail-dot"></div><span id="rail-txt">Railway: не настроен</span></div>
+    <div class="fb-row" style="margin-top:4px;"><div class="fb-dot" id="rail-dot"></div><span id="rail-txt">VPS: не настроен</span></div>
   </div>
 </aside>
 
@@ -373,7 +420,7 @@ window._fb={
   <div class="railway-bar" id="railway-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     <span id="railway-bar-txt">VPS: подключение...</span>
-    <button class="btn btn-g" style="padding:4px 12px;font-size:11.5px;margin-left:auto;" onclick="checkRailway()">Проверить</button>
+    <button class="btn btn-g" style="padding:4px 12px;font-size:11.5px;margin-left:auto;" onclick="checkVps()">Проверить</button>
   </div>
   <div class="pause-bar" id="pause-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
@@ -485,7 +532,7 @@ window._fb={
   <div class="ph"><div class="ph-title">Тестовый чат</div><div class="ph-sub">Реальный Claude API · виден вызов функций · промпт из настроек</div></div>
   <div class="chat-wrap" style="height:500px;">
     <div class="chat-header">
-      <div><div class="chat-title">Тест · IGS Outdoor Bot</div><div class="chat-sub" id="test-status">Введи Claude API Key в настройках</div></div>
+      <div><div class="chat-title">Тест · IGS Outdoor Bot</div><div class="chat-sub" id="test-status">Реальный бот на VPS · Gemini+OpenRouter · калькулятор · RAG</div></div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="clearTestChat()">Очистить</button>
         <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="runScenario()">Авто-сценарий</button>
@@ -539,12 +586,12 @@ window._fb={
   </div>
   <div class="fc escalate" id="fc-esc">
     <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('esc',this)"><span class="ts-"></span></label><div class="fname">escalate_to_human</div><span class="fpb">1 параметр</span><span class="b b-y">Приоритет</span></div>
-    <div class="fdesc">Клиент просит живого менеджера или перезвонить — бот замолкает, заявка → Firebase → Telegram со статусом escalated.</div>
+    <div class="fdesc">Клиент просит живого менеджера или перезвонить — бот замолкает, заявка → Supabase → Telegram со статусом escalated.</div>
     <div class="fpl">
       <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Описание</span></div>
       <div class="fpr"><span class="pn">reason</span><span class="pt">string</span><span class="pd">Что именно сказал клиент</span></div>
     </div>
-    <div style="margin-top:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--warn);">После эскалации диалог записывается в Firebase paused_chats — бот не отвечает этому клиенту с любого устройства.</div>
+    <div style="margin-top:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--warn);">После эскалации диалог записывается в Supabase paused_chats — бот не отвечает этому клиенту с любого устройства.</div>
   </div>
   <div class="brow"><button class="btn btn-p" onclick="saveFunctions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button></div>
 </div>
@@ -652,7 +699,7 @@ window._fb={
 </div>
 
 <div class="page" id="page-prompt">
-  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Сохраняется в Firebase → Railway подхватывает без перезапуска</div></div>
+  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Сохраняется в Supabase → VPS подхватывает автоматически</div></div>
   <div class="card">
     <div class="ct">Личность бота</div>
     <div class="field"><label>Имя бота</label><input type="text" value="Ассистент IGS Outdoor" id="bot-name"></div>
@@ -681,14 +728,14 @@ window._fb={
     </div>
     <div class="brow">
       <button class="btn btn-p" onclick="savePrompt()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button>
-      <button class="btn btn-g" onclick="pushPromptToRailway()">→ Применить на Railway</button>
+      <button class="btn btn-g" onclick="pushPromptToVps()">→ Применить на VPS</button>
     </div>
   </div>
 </div>
 
 <!-- ══ KEYS ══ -->
 <div class="page" id="page-keys">
-  <div class="ph"><div class="ph-title">API ключи</div><div class="ph-sub">Ключи для тестового чата · Railway URL для управления ботом</div></div>
+  <div class="ph"><div class="ph-title">API ключи</div><div class="ph-sub">Ключи для тестового чата · VPS URL для управления ботом</div></div>
   <div class="card">
     <div class="ct">VPS Backend (твой сервер)</div>
     <div class="field">
@@ -696,7 +743,7 @@ window._fb={
       <input type="text" class="mono" id="railway-url" placeholder="http://45.136.58.180:3001" oninput="saveRailwayUrl()">
       <div class="fhint">Адрес твоего VPS сервера — дашборд управляет ботом через него. Пример: http://45.136.58.180:3001</div>
     </div>
-    <div class="brow"><button class="btn btn-teal" onclick="checkRailway()">Проверить соединение</button></div>
+    <div class="brow"><button class="btn btn-teal" onclick="checkVps()">Проверить соединение</button></div>
   </div>
   <div class="card">
     <div class="ct">Claude API Key (для тестового чата)</div>
@@ -717,7 +764,7 @@ window._fb={
       <button class="btn btn-teal" onclick="testClaudeKey()">Проверить Claude</button>
     </div>
     <div style="margin-top:12px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--accent);">
-      Реальные API ключи (Claude, OpenAI, Telegram, Firebase) вставляются в Railway Variables — не сюда. Здесь только для тестового чата.
+      Реальные API ключи (Claude, OpenAI, Telegram, Firebase) вставляются в VPS .env файл — не сюда. Здесь только для тестового чата.
     </div>
   </div>
 </div>
@@ -1202,7 +1249,7 @@ function getRailwayUrl(){ return (localStorage.getItem('igs_railway_url')||'http
 function saveRailwayUrl(){
   const val = $('railway-url')?.value||'';
   localStorage.setItem('igs_railway_url', val);
-  if(val) checkRailway();
+  if(val) checkVps();
 }
 
 async function railwayFetch(path, opts={}){
@@ -1217,15 +1264,15 @@ async function railwayFetch(path, opts={}){
   return res.json();
 }
 
-async function checkRailway(){
+async function checkVps(){
   const base=getRailwayUrl();
-  if(!base){toast('Укажи Railway URL в разделе API ключи','warn');return;}
+  if(!base){toast('Укажи VPS URL в разделе API ключи','warn');return;}
   try {
     const data = await railwayFetch('/health');
     $('rail-dot').className='fb-dot on';
-    $('rail-txt').textContent=`Railway: OK · uptime ${data.uptime}s`;
-    $('railway-bar-txt').textContent=`Railway подключён · бот ${data.botState} · uptime ${data.uptime}s`;
-    toast('Railway: соединение установлено');
+    $('rail-txt').textContent=`VPS: OK · uptime ${data.uptime}s`;
+    $('railway-bar-txt').textContent=`VPS подключён · бот ${data.botState} · uptime ${data.uptime}s`;
+    toast('VPS: соединение установлено');
     addLog(`✓ Railway: ok (${data.botState})`,'lok');
     // Также получаем полный статус
     const status = await railwayFetch('/api/status');
@@ -1233,8 +1280,8 @@ async function checkRailway(){
     applyState(status.botState||'active');
   } catch(e){
     $('rail-dot').className='fb-dot';
-    $('rail-txt').textContent=`Railway: ошибка — ${e.message}`;
-    $('railway-bar-txt').textContent=`Railway: ошибка подключения — ${e.message}`;
+    $('rail-txt').textContent=`VPS: ошибка — ${e.message}`;
+    $('railway-bar-txt').textContent=`VPS: ошибка подключения — ${e.message}`;
     toast('Railway: '+e.message,'err');
     addLog(`✗ Railway: ${e.message}`,'lerr');
   }
@@ -1342,7 +1389,7 @@ function addTestLead(){
     Measurement_Date_Time:'Пятница 15:00',
     Stage:stages[Math.floor(Math.random()*3)],
     status:'new',
-  }).then(()=>{toast('Тест заявка добавлена');addLog('↑ save_user_data тест → Firebase','lfb');});
+  }).then(()=>{toast('Тест заявка добавлена');addLog('↑ save_user_data тест → Supabase','lfb');});
 }
 
 // ── Dialogs ───────────────────────────────────────────────────────────────────
@@ -1393,8 +1440,8 @@ async function openDialog(chatId,el){
     });
     msgs.scrollTop=msgs.scrollHeight;
   } catch(e){
-    $('dlg-sub').textContent='Railway недоступен — данные из Supabase';
-    msgs.innerHTML='<div class="msg system">Укажи Railway URL для просмотра диалогов</div>';
+    $('dlg-sub').textContent='VPS недоступен — данные из Supabase';
+    msgs.innerHTML='<div class="msg system">Укажи VPS URL для просмотра диалогов</div>';
   }
 }
 
@@ -1467,73 +1514,45 @@ function appendTestMsg(text,role,funcName){
 async function sendTestMsg(){
   const inp=$('test-input');
   const msg=inp.value.trim();if(!msg)return;
-  const key=localStorage.getItem('igs_claude_key');
-  if(!key){toast('Укажи Claude API Key в разделе API ключи','warn');return;}
   inp.value='';
   appendTestMsg(msg,'user',null);
   window._testHistory.push({role:'user',content:msg});
   const typingDiv=appendTestMsg('печатает...','typing',null);
-  $('test-status').textContent='Claude думает...';
+  $('test-status').textContent='Бот думает (через VPS)...';
 
   try {
-    const prompt=$('system-prompt')?.value||'Ты ассистент IGS Outdoor.';
-    const model=localStorage.getItem('igs_model')||'claude-sonnet-4-20250514';
-    const tools=[
-      {name:'save_user_data',description:'Сохраняет заявку.',input_schema:{type:'object',properties:{Name:{type:'string'},Location:{type:'string'},Dimensions:{type:'string'},Construction_Type:{type:'string'},Measurement_Date_Time:{type:'string'},Stage:{type:'string',enum:['горячий','тёплый','холодный']},phone:{type:'string'}},required:['Construction_Type','Stage']}},
-      {name:'Image',description:'Вызывай при фото.',input_schema:{type:'object',properties:{caption:{type:'string'}}}},
-      {name:'escalate_to_human',description:'Передаёт менеджеру.',input_schema:{type:'object',properties:{reason:{type:'string'}},required:['reason']}},
-    ];
+    // Используем реальный бот на VPS — ТОТ ЖЕ промпт, RAG, tools, калькулятор, что и для клиентов
+    const data = await railwayFetch('/api/test-chat',{
+      method: 'POST',
+      body: JSON.stringify({
+        message: msg,
+        chatId: 'dashboard_test_' + (window._testSessionId = window._testSessionId || Date.now()),
+        history: window._testHistory.slice(0, -1) // без последнего (только что добавили)
+      })
+    });
 
-    // Agentic loop — обрабатываем tool_use правильно
-    let finalText='', funcsCalled=[], loopMsgs=[...window._testHistory];
+    const reply = data.reply || data.message || '(нет ответа)';
+    const funcsCalled = data.toolCalls || data.tools_called || data.functions_called || [];
 
-    for(let i=0;i<5;i++){
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model,max_tokens:1024,system:prompt,tools,messages:loopMsgs}),
-      });
-      if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||resp.status);}
-      const data=await resp.json();
-
-      const toolUseBlocks=data.content.filter(b=>b.type==='tool_use');
-      const textBlocks=data.content.filter(b=>b.type==='text');
-      finalText+=textBlocks.map(b=>b.text).join('');
-
-      if(!toolUseBlocks.length||data.stop_reason==='end_turn'){
-        // Финальный ответ — сохраняем в историю
-        window._testHistory.push({role:'assistant',content:data.content});
-        loopMsgs.push({role:'assistant',content:data.content});
-        break;
-      }
-
-      // Есть tool_use — добавляем ответ ассистента и tool_result
-      loopMsgs.push({role:'assistant',content:data.content});
-      const toolResults=[];
-      for(const tb of toolUseBlocks){
-        funcsCalled.push(tb.name);
-        addLog(`⚙ Тест: ${tb.name}(${JSON.stringify(tb.input)})`,'lfb');
-        toolResults.push({type:'tool_result',tool_use_id:tb.id,content:`Функция ${tb.name} выполнена успешно`});
-      }
-      loopMsgs.push({role:'user',content:toolResults});
-    }
-
-    // Сохраняем финальную историю
-    window._testHistory=[...loopMsgs];
-
+    window._testHistory.push({role:'assistant',content:reply});
     typingDiv.remove();
-    appendTestMsg(finalText||'(функция выполнена)','bot',funcsCalled.length?funcsCalled.join(', '):null);
-    $('test-status').textContent='Готов · '+model;
+    appendTestMsg(reply, 'bot', funcsCalled.length ? funcsCalled.join(', ') : null);
+    $('test-status').textContent='Готов · Gemini/OpenRouter · ' + (data.model || 'через VPS');
 
-    if(funcsCalled.includes('escalate_to_human'))toast('escalate_to_human вызвана!','warn');
-    if(funcsCalled.includes('save_user_data'))toast('save_user_data вызвана!','info');
-    if(funcsCalled.includes('Image'))toast('Image вызвана!','info');
-
+    if (funcsCalled.length) {
+      addLog('⚙ Функции: ' + funcsCalled.join(', '), 'lfb');
+      funcsCalled.forEach(f => {
+        if (f === 'escalate_to_human') toast('escalate_to_human!','warn');
+        else if (f === 'calculate_quote') toast('calculate_quote','info');
+        else if (f === 'save_user_data') toast('save_user_data','info');
+        else if (f.includes('photos') || f.includes('suggestions')) toast('медиа: ' + f,'info');
+      });
+    }
   } catch(e){
     typingDiv.remove();
     appendTestMsg('Ошибка: '+e.message,'msg system',null);
-    $('test-status').textContent='Ошибка: '+e.message;
-    toast(e.message,'err');
+    $('test-status').textContent='Ошибка VPS: '+e.message;
+    toast('VPS: '+e.message,'err');
   }
 }
 
@@ -1592,10 +1611,10 @@ async function savePrompt(){
   const data={systemPrompt:$('system-prompt')?.value,botName:$('bot-name')?.value,lang:$('lang')?.value,tone:$('tone')?.value,updatedAt:Date.now()};
   await window._fb.save('bot_settings',data);
   toast('Промпт сохранён');
-  addLog('↑ bot_settings → Firebase','lfb');
+  addLog('↑ bot_settings → Supabase','lfb');
 }
 
-async function pushPromptToRailway(){
+async function pushPromptToVps(){
   await savePrompt();
   try {
     await railwayFetch('/api/settings',{method:'POST',body:JSON.stringify({systemPrompt:$('system-prompt')?.value})});
@@ -1708,7 +1727,7 @@ async function init(){
   // Автоподключение к VPS через 1 сек
   if(railUrl) {
     addLog('↺ Подключение к VPS...', 'linf');
-    setTimeout(checkRailway, 1000);
+    setTimeout(checkVps, 1000);
   }
 
   if(key) if($('test-status')) $('test-status').textContent = 'Готов к тестированию';
@@ -1774,7 +1793,7 @@ async function saveRules() {
     addLog('✓ Правила обновлены: ' + _rules.length + ' пунктов', 'lfb');
   } catch(e) {
     localStorage.setItem('igs_rules', JSON.stringify(_rules));
-    toast('Сохранено локально (Railway недоступен)', 'warn');
+    toast('Сохранено локально (VPS недоступен)', 'warn');
   }
 }
 
@@ -2270,7 +2289,7 @@ async function loadFeedbackList() {
         <button onclick="deleteFeedback('${f.id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;padding:4px;flex-shrink:0;">×</button>
       </div>`).join('');
   } catch(e) {
-    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи Railway URL</div>`;
+    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи VPS URL</div>`;
   }
 }
 
@@ -2305,7 +2324,7 @@ async function loadErrorPatterns() {
         <button onclick="deletePattern('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;">×</button>
       </div>`).join('');
   } catch(e) {
-    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи Railway URL</div>`;
+    el.innerHTML=`<div style="color:var(--muted);font-size:13px;">Укажи VPS URL</div>`;
   }
 }
 
