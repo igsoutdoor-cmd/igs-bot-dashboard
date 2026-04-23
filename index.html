@@ -190,6 +190,88 @@ select option{background:#fff;}
 .stage-warm{background:rgba(245,158,11,.12);color:var(--warn);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
 .stage-cold{background:rgba(96,165,250,.12);color:var(--info);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
 #qr-image{width:150px;height:150px;margin:0 auto 14px;display:block;}
+
+/* ═══ Mobile hamburger + overlay ═══ */
+.mobile-hdr{display:none;position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;align-items:center;gap:12px;}
+.hamb{background:transparent;border:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);border-radius:8px;}
+.hamb:hover{background:var(--bg3);}
+.hamb svg{width:22px;height:22px;}
+.mobile-hdr-title{font-weight:700;font-size:15px;}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;}
+.sb-overlay.show{display:block;}
+
+/* ═══ Tablet: <=1024px ═══ */
+@media (max-width:1024px){
+  .shell{grid-template-columns:210px 1fr;}
+  .main{padding:20px 22px;}
+  .sgrid{grid-template-columns:repeat(2,1fr) !important;}
+  .frow{grid-template-columns:1fr !important;}
+  .split{grid-template-columns:240px 1fr;height:auto;min-height:520px;}
+  .card{padding:16px;}
+  /* все inline grid-template-columns repeat(3|4) и 1fr 1fr 1fr */
+  .main [style*="grid-template-columns:repeat(4"],
+  .main [style*="grid-template-columns:repeat(3"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  .main [style*="grid-template-columns:1fr 1fr 1fr"]{
+    grid-template-columns:1fr 1fr !important;
+  }
+}
+
+/* ═══ Mobile: <=768px ═══ */
+@media (max-width:768px){
+  body{font-size:14.5px;}
+  .mobile-hdr{display:flex;}
+  .shell{grid-template-columns:1fr;}
+  .sidebar{position:fixed;top:0;left:0;height:100dvh;width:260px;z-index:45;transform:translateX(-100%);transition:transform .22s ease;box-shadow:8px 0 24px rgba(0,0,0,.15);}
+  .sidebar.open{transform:translateX(0);}
+  .main{padding:14px 14px 70px;}
+  .sgrid{grid-template-columns:repeat(2,1fr) !important;gap:8px;}
+  .sc{padding:11px 12px;}
+  .sc-val{font-size:22px;}
+  .ph{margin-bottom:14px;}
+  .ph-title{font-size:20px;}
+  .ph-sub{font-size:12px;}
+  .card{padding:13px;border-radius:10px;margin-bottom:10px;}
+  .ct{font-size:13.5px;}
+  /* Split (диалоги) — стек: список сверху, чат снизу */
+  .split{grid-template-columns:1fr !important;height:auto;gap:10px;}
+  .split-left{max-height:280px;}
+  .chat-wrap{height:60vh !important;min-height:380px;}
+  /* Таблицы — горизонтальный скролл */
+  .lt{font-size:12.5px;}
+  .lt th,.lt td{padding:8px 9px;}
+  /* Все inline grid → 1 col на мобильном (кроме sgrid который 2 col выше) */
+  .main [style*="grid-template-columns:repeat(4"],
+  .main [style*="grid-template-columns:repeat(3"],
+  .main [style*="grid-template-columns:1fr 1fr 1fr"],
+  .main [style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
+  /* Кнопки-фильтры в диалогах — шире и кликабельнее */
+  .dlg-filt{padding:6px 10px !important;font-size:12px !important;}
+  /* Chat input ряд — меньше отступов */
+  .chat-input-row{padding:8px;gap:6px;}
+  .chat-input{font-size:14.5px;}
+  /* Toast — сверху чтобы не перекрывал кнопку отправки */
+  .toast{bottom:auto;top:12px;right:12px;left:12px;justify-content:center;}
+  /* Sidebar внутри — скрыть сжатый футер */
+  .logo-sub{font-size:11.5px;}
+  /* Флоу-бар (Supabase-status) */
+  .fb-row{flex-wrap:wrap;}
+  /* Dashboard header (KPI + переключатели бота) */
+  .main [style*="display:flex"][style*="justify-content:space-between"]{flex-wrap:wrap;gap:8px;}
+  /* Скрыть избыточные колонки таблицы лидов на узких экранах */
+  .lt th:nth-child(4),.lt td:nth-child(4),
+  .lt th:nth-child(5),.lt td:nth-child(5){display:none;}
+}
+
+/* ═══ Очень узкий: <=420px ═══ */
+@media (max-width:420px){
+  .sgrid{grid-template-columns:1fr !important;}
+  .sc-val{font-size:20px;}
+  .main{padding:12px 10px 70px;}
+}
 </style>
 </head>
 <body>
@@ -382,8 +464,17 @@ select option{background:#fff;}
 })();
 </script>
 
+<!-- Mobile header (виден только на <=768px) -->
+<div class="mobile-hdr">
+  <button class="hamb" onclick="toggleSidebar()" aria-label="Меню">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="mobile-hdr-title">IGS Bot</div>
+</div>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar(false)"></div>
+
 <div class="shell">
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
     <div class="logo-title">IGS Bot</div>
@@ -1002,6 +1093,19 @@ function go(name,btn){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
   $('page-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
+  // Mobile: close sidebar after nav
+  if(window.innerWidth <= 768) toggleSidebar(false);
+  // Scroll to top on mobile
+  if(window.innerWidth <= 768) window.scrollTo({top:0,behavior:'instant'});
+}
+function toggleSidebar(force){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sb-overlay');
+  if(!sb || !ov) return;
+  const shouldOpen = (typeof force === 'boolean') ? force : !sb.classList.contains('open');
+  sb.classList.toggle('open', shouldOpen);
+  ov.classList.toggle('show', shouldOpen);
+  document.body.style.overflow = shouldOpen ? 'hidden' : '';
 }
 function updateCount(){const el=$('system-prompt');if(el&&$('char-count'))$('char-count').textContent=el.value.length;}
 function setFb(ok){
