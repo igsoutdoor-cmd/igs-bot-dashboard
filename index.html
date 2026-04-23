@@ -296,26 +296,55 @@ select option{background:#fff;}
     setInterval(loadBotStatus,10000);
   });
 
-  // ── Диалоги ──
+  // ── Диалоги: /api/green-chats (объединяет Green API + Supabase) ──
   async function loadDialogsFromBot(){
     try{
-      const r=await fetch(getVpsUrl()+'/api/dialogs');
+      const r=await fetch(getVpsUrl()+'/api/green-chats');
       if(!r.ok)return;
-      const arr=await r.json();
+      const data=await r.json();
+      const arr=data.chats||[];
       const mapped=arr.map(d=>({
-        id:d.id,
+        id:d.id||d.chatId,
+        chatId:d.chatId||d.id,
         messageCount:d.message_count||0,
-        lastActivity:d.last_activity?new Date(d.last_activity).getTime():0,
-        participant_name:d.participant_name||'',
+        lastActivity:d.last_activity||0,
+        participant_name:d.name||d.participant_name||d.phone,
+        name:d.name||d.phone,
+        phone:d.phone,
         stage:d.stage||'',
+        construction_type:d.construction_type||'',
         paused:d.paused||false,
-      })).sort((a,b)=>(b.lastActivity||0)-(a.lastActivity||0));
-      if(typeof renderDialogList==='function')renderDialogList(mapped);
-    }catch(e){console.warn('[VPS] dialogs:',e.message);}
+        inBot:d.in_bot,
+        rejectedOptions:d.rejected_options||[],
+        confirmedOptions:d.confirmed_options||[],
+        lastKpTotal:d.last_kp_total,
+        source:d.source,
+      }));
+      window._allDialogs = mapped;
+      // Показываем stats в sidebar badge — горячие в уведомлении
+      if($('nav-cnt')) $('nav-cnt').textContent = data.hotCount || mapped.length;
+      applyDialogFilter(window._dialogFilter || 'all');
+    }catch(e){console.warn('[VPS] green-chats:',e.message);}
   }
+  // Фильтр "Лучшие": горячие + с КП + много сообщений
+  window._dialogFilter = 'all';
+  window.applyDialogFilter = function(f){
+    window._dialogFilter = f;
+    let list = window._allDialogs || [];
+    if(f==='hot') list = list.filter(d=>d.stage==='горячий');
+    if(f==='warm') list = list.filter(d=>d.stage==='тёплый');
+    if(f==='with_kp') list = list.filter(d=>d.lastKpTotal);
+    if(f==='paused') list = list.filter(d=>d.paused);
+    if(f==='best') list = list.filter(d=>d.stage==='горячий'||d.stage==='тёплый'||d.lastKpTotal||(d.messageCount||0)>=8);
+    if(typeof renderDialogList==='function')renderDialogList(list);
+    // Обновить активную подсветку кнопки
+    document.querySelectorAll('[data-dlg-filter]').forEach(b=>{
+      b.classList.toggle('active', b.dataset.dlgFilter===f);
+    });
+  };
   window.addEventListener('DOMContentLoaded',function(){
     loadDialogsFromBot();
-    setInterval(loadDialogsFromBot,10000);
+    setInterval(loadDialogsFromBot,15000); // 15 сек — кэш endpoint 60 сек
   });
 
   // ── window._fb API ──
@@ -503,7 +532,17 @@ select option{background:#fff;}
   <div class="ph"><div class="ph-title">Диалоги</div><div class="ph-sub">История переписки · Supabase · накопительная синхронизация</div></div>
   <div class="split">
     <div class="split-left">
-      <div style="padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Клиенты</div>
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Клиенты (WhatsApp + бот)</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-g dlg-filt active" data-dlg-filter="all" onclick="applyDialogFilter('all')" style="padding:3px 9px;font-size:11px;">Все</button>
+          <button class="btn btn-g dlg-filt" data-dlg-filter="best" onclick="applyDialogFilter('best')" style="padding:3px 9px;font-size:11px;">⭐ Лучшие</button>
+          <button class="btn btn-g dlg-filt" data-dlg-filter="hot" onclick="applyDialogFilter('hot')" style="padding:3px 9px;font-size:11px;">🔥 Горячие</button>
+          <button class="btn btn-g dlg-filt" data-dlg-filter="warm" onclick="applyDialogFilter('warm')" style="padding:3px 9px;font-size:11px;">☀ Тёплые</button>
+          <button class="btn btn-g dlg-filt" data-dlg-filter="with_kp" onclick="applyDialogFilter('with_kp')" style="padding:3px 9px;font-size:11px;">📑 С КП</button>
+          <button class="btn btn-g dlg-filt" data-dlg-filter="paused" onclick="applyDialogFilter('paused')" style="padding:3px 9px;font-size:11px;">⏸ Пауза</button>
+        </div>
+      </div>
       <div class="dl" id="dialog-list"><div style="padding:20px;color:var(--muted);font-size:13px;">Загрузка диалогов...</div></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1420,28 +1459,71 @@ async function openDialog(chatId,el){
   document.querySelectorAll('.di').forEach(d=>d.classList.remove('active'));
   if(el)el.classList.add('active');
   window._currentChatId=chatId;
-  $('dlg-title').textContent=chatId;
+
+  // Найдём данные этого чата из cache
+  const cur = (window._allDialogs||[]).find(d=>d.chatId===chatId || d.id===chatId);
+  const phone = (cur?.phone) || chatId.replace('@c.us','');
+  const name = cur?.name || phone;
+  $('dlg-title').textContent = name + (cur?.paused ? ' ⏸' : '');
+
+  // Кнопка пауза/возобновить — отражает реальное состояние
+  const pauseBtn = $('dlg-pause-btn');
+  if (pauseBtn) pauseBtn.textContent = cur?.paused ? '▶ Возобновить' : 'Пауза';
+
   $('dlg-sub').textContent='Загрузка истории...';
   const msgs=$('dlg-msgs');
   msgs.innerHTML='<div class="msg system">Загрузка...</div>';
 
   try {
-    // Загружаем сообщения из Railway
+    // История из Supabase — содержит tool_use/tool_result для show функций
     const data = await railwayFetch(`/api/dialogs/${encodeURIComponent(chatId)}/messages`);
-    $('dlg-sub').textContent=`${data.length} сообщений · из Supabase`;
-    msgs.innerHTML=`<div class="msg system">Диалог · ${chatId}</div>`;
+    const meta = [];
+    if (cur?.stage) meta.push(stagePill(cur.stage));
+    if (cur?.construction_type) meta.push(`<span style="color:var(--muted)">${cur.construction_type}</span>`);
+    if (cur?.confirmedOptions?.length) meta.push(`<span style="color:var(--accent)">✓ ${cur.confirmedOptions.join(', ')}</span>`);
+    if (cur?.rejectedOptions?.length) meta.push(`<span style="color:var(--danger)">✗ ${cur.rejectedOptions.join(', ')}</span>`);
+    if (cur?.lastKpTotal) meta.push(`<span style="color:var(--purple)">📑 КП ${new Intl.NumberFormat('ru-RU').format(cur.lastKpTotal)} ₸</span>`);
+    $('dlg-sub').innerHTML = `${data.length} сообщ · ${phone}${meta.length?' · '+meta.join(' · '):''}`;
+
+    msgs.innerHTML = '';
+    // Рендерим сообщения + показываем какие tools вызывались
     data.forEach(m=>{
-      const div=document.createElement('div');
-      const isUser=m.role==='user';
-      div.className='msg '+(isUser?'user':'bot');
-      const text=typeof m.content==='string'?m.content:m.content?.find?.(b=>b.type==='text')?.text||'[медиа]';
-      div.innerHTML=`${text}<div class="msg-meta">${fmtTime(m.timestamp)}</div>`;
+      const isUser = m.role === 'user';
+      const content = Array.isArray(m.content) ? m.content : [{type:'text',text:typeof m.content==='string'?m.content:''}];
+
+      // Проверяем tool_use и tool_result
+      const toolCalls = content.filter(b => b.type === 'tool_use');
+      const toolResults = content.filter(b => b.type === 'tool_result');
+      const textBlocks = content.filter(b => b.type === 'text');
+      const text = textBlocks.map(b => b.text || '').join('').trim();
+
+      // Для user пропускаем tool_result — это внутренний ответ от функций
+      if (isUser && toolResults.length && !text) return;
+
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isUser ? 'user' : 'bot');
+      let html = text || (isUser ? '[медиа]' : '');
+      // Добавляем бейджи для каждого tool_call
+      if (toolCalls.length) {
+        const badges = toolCalls.map(tc => {
+          const fnIcons = {
+            calculate_quote: '🧮', web_search: '🔍', send_product_photos: '📸',
+            send_suggestions: '🖼', create_kp: '📑', escalate_to_human: '⚠',
+            save_user_data: '💾', book_showroom: '🏢', Image: '🖼'
+          };
+          const ic = fnIcons[tc.name] || '⚙';
+          return `<span style="display:inline-block;background:rgba(37,99,235,.1);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:600;margin:3px 4px 0 0;">${ic} ${tc.name}</span>`;
+        }).join('');
+        html += `<div style="margin-top:6px;">${badges}</div>`;
+      }
+      html += `<div class="msg-meta">${fmtTime(m.timestamp || m.ts)}</div>`;
+      div.innerHTML = html;
       msgs.appendChild(div);
     });
-    msgs.scrollTop=msgs.scrollHeight;
+    msgs.scrollTop = msgs.scrollHeight;
   } catch(e){
-    $('dlg-sub').textContent='VPS недоступен — данные из Supabase';
-    msgs.innerHTML='<div class="msg system">Укажи VPS URL для просмотра диалогов</div>';
+    $('dlg-sub').textContent='Ошибка загрузки: '+e.message;
+    msgs.innerHTML='<div class="msg system">Не удалось загрузить историю</div>';
   }
 }
 
@@ -1464,21 +1546,31 @@ async function quickFeedback(rating) {
 }
 
 async function pauseSelectedDialog(){
-  if(!window._currentChatId)return;
+  if(!window._currentChatId){toast('Выбери диалог','warn');return;}
+  // Toggle: если на паузе → resume, иначе pause
+  const cur = (window._allDialogs||[]).find(d=>d.chatId===window._currentChatId);
+  const isPaused = cur && cur.paused;
   try {
-    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/pause`,{method:'POST'});
-    toast('Диалог приостановлен — синхронизировано','warn');
-    addLog(`⏸ Пауза: ${window._currentChatId}`,'lwarn');
-  } catch(e){ toast('Railway: '+e.message,'err'); }
+    const path = isPaused ? 'resume' : 'pause';
+    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/${path}`,{method:'POST'});
+    toast(isPaused ? '▶ Бот снова отвечает клиенту' : '⏸ Бот на паузе для клиента', isPaused ? 'info' : 'warn');
+    addLog(`${isPaused?'▶':'⏸'} ${isPaused?'Resume':'Pause'}: ${window._currentChatId}`, isPaused?'lok':'lwarn');
+    if (cur) cur.paused = !isPaused;
+    const btn = $('dlg-pause-btn');
+    if (btn) btn.textContent = isPaused ? 'Пауза' : '▶ Возобновить';
+    setTimeout(()=>loadDialogsFromBot&&loadDialogsFromBot(),2000);
+  } catch(e){ toast('VPS: '+e.message,'err'); }
 }
 
 async function closeSelectedDialog(){
-  if(!window._currentChatId)return;
+  if(!window._currentChatId){toast('Выбери диалог','warn');return;}
+  if(!confirm('Закрыть этот диалог? Бот больше не будет отвечать клиенту.')) return;
   try {
-    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/resume`,{method:'POST'});
-    toast('Диалог возобновлён','info');
-    addLog(`▶ Возобновлён: ${window._currentChatId}`,'lok');
-  } catch(e){ toast('Railway: '+e.message,'err'); }
+    await railwayFetch(`/api/chat/${encodeURIComponent(window._currentChatId)}/stop-dialog`,{method:'POST',body:JSON.stringify({reason:'closed_by_manager'})});
+    toast('Диалог закрыт','info');
+    addLog(`✗ Закрыт: ${window._currentChatId}`,'lerr');
+    setTimeout(()=>loadDialogsFromBot&&loadDialogsFromBot(),1000);
+  } catch(e){ toast('VPS: '+e.message,'err'); }
 }
 
 async function sendManagerMsg(){
@@ -2044,135 +2136,6 @@ function useTemplate(type) {
   if($('con-input')) {
     $('con-input').value = text || '';
     if(text) sendConstructorMsg();
-    else $('con-input').focus();
-  }
-}
-
-let constructorHistory = [];
-
-function conAppendMsg(text, role, extract) {
-  const msgs = $('con-msgs');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.innerHTML = text.replace(/\n/g, '<br>') + `<div class="msg-meta">${now()}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  // Извлекаем промпт если есть
-  if (extract && text.includes('---ПРОМПТ---')) {
-    const match = text.match(/---ПРОМПТ---([\s\S]*?)---КОНЕЦ---/);
-    if (match) {
-      const prompt = match[1].trim();
-      if ($('con-prompt-result')) $('con-prompt-result').value = prompt;
-      toast('✓ Промпт сгенерирован — нажми "Применить к боту"!', 'info');
-      addLog('✓ Конструктор: промпт сгенерирован', 'lfb');
-    }
-  }
-}
-
-async function sendConstructorMsg() {
-  const inp = $('con-input');
-  const msg = inp.value.trim();
-  if (!msg) return;
-  const key = localStorage.getItem('igs_claude_key');
-  if (!key) { toast('Укажи Claude API Key в разделе API ключи', 'warn'); return; }
-
-  inp.value = '';
-  conAppendMsg(msg, 'user', false);
-  constructorHistory.push({ role: 'user', content: msg });
-
-  const typing = document.createElement('div');
-  typing.className = 'msg typing';
-  typing.textContent = 'Claude думает...';
-  $('con-msgs').appendChild(typing);
-  $('con-msgs').scrollTop = 99999;
-  $('con-status').textContent = 'Claude думает...';
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: localStorage.getItem('igs_model') || 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        system: CONSTRUCTOR_SYSTEM,
-        messages: constructorHistory,
-      }),
-    });
-
-    typing.remove();
-    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error?.message); }
-    const data = await resp.json();
-    const reply = data.content.find(b => b.type === 'text')?.text || '';
-    constructorHistory.push({ role: 'assistant', content: reply });
-    conAppendMsg(reply, 'bot', true);
-    $('con-status').textContent = `${constructorHistory.length} сообщений · готов`;
-  } catch(e) {
-    typing.remove();
-    conAppendMsg('Ошибка: ' + e.message, 'system', false);
-    $('con-status').textContent = 'Ошибка: ' + e.message;
-  }
-}
-
-function clearConstructor() {
-  constructorHistory = [];
-  $('con-msgs').innerHTML = '<div class="msg system">Чат очищен. Опиши своего бота!</div>';
-  if($('con-prompt-result')) $('con-prompt-result').value = '';
-  $('con-status').textContent = 'Опиши своего бота — Claude поможет создать промпт';
-}
-
-function startConstructor() {
-  clearConstructor();
-  $('con-input').value = '';
-  $('con-input').focus();
-}
-
-async function applyConstructorPrompt() {
-  const prompt = $('con-prompt-result')?.value?.trim();
-  if (!prompt) { toast('Сначала сгенерируй промпт в чате', 'warn'); return; }
-
-  // Сохраняем в Firebase
-  if (window._fb) {
-    await window._fb.save('bot_settings', { systemPrompt: prompt, updatedAt: Date.now() });
-  }
-
-  // Применяем на Railway
-  try {
-    await railwayFetch('/api/settings', { method: 'POST', body: JSON.stringify({ systemPrompt: prompt }) });
-    toast('✅ Промпт применён к боту!');
-    addLog('✓ Конструктор: промпт применён к боту', 'lfb');
-    // Синхронизируем с редактором промпта
-    if($('system-prompt')) $('system-prompt').value = prompt;
-  } catch(e) {
-    toast('Настройки обновлены, Railway: ' + e.message, 'warn');
-  }
-}
-
-function copyConstructorPrompt() {
-  const prompt = $('con-prompt-result')?.value;
-  if (!prompt) { toast('Нет промпта для копирования', 'warn'); return; }
-  navigator.clipboard.writeText(prompt).then(() => toast('Скопировано!'));
-}
-
-const TEMPLATES = {
-  restaurant: 'У меня ресторан в Алматы. Бот должен принимать брони столиков, отвечать на вопросы о меню и режиме работы, общаться на русском и казахском.',
-  salon: 'У меня салон красоты. Бот должен записывать клиентов на услуги, рассказывать о ценах, мастерах и акциях.',
-  realty: 'Я риелтор, продаю и сдаю квартиры в Алматы. Бот должен квалифицировать клиентов — покупка или аренда, бюджет, район, и передавать горячих лидов мне.',
-  clinic: 'У меня медицинский центр. Бот записывает на приём к врачам, отвечает на вопросы об услугах и ценах, не даёт медицинских советов.',
-  shop: 'У меня интернет-магазин одежды. Бот помогает подобрать размер, отвечает на вопросы о наличии, доставке и возврате.',
-  custom: 'Расскажи о своём бизнесе подробно...',
-};
-
-function useTemplate(type) {
-  const text = TEMPLATES[type];
-  if ($('con-input')) {
-    $('con-input').value = text;
-    if (type !== 'custom') sendConstructorMsg();
     else $('con-input').focus();
   }
 }
