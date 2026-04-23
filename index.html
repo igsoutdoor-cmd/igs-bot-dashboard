@@ -194,14 +194,19 @@ select option{background:#fff;}
 </head>
 <body>
 
-<!-- Supabase UMD (не модуль — грузится надёжнее) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase-js.min.js"></script>
+<!-- Supabase UMD (не модуль — грузится надёжнее). Pin к версии, путь dist/umd/supabase.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){
   const SUPA_URL='https://qglkajbaviutmxfwodui.supabase.co';
   // PUBLISHABLE (anon) key — read-only. Все политики allow_all читать публично.
   // Запись идёт через /api/* endpoints бота с service_role на сервере.
   const SUPA_KEY='sb_publishable_-d-LvsRXnVznPwDa0IQgVQ_6ngau3R3';
+  if (typeof supabase === 'undefined' || !supabase.createClient) {
+    console.error('[SUPA] UMD bundle not loaded — Supabase client unavailable');
+    window._sb = null;
+    return; // выходим из IIFE, но остальной JS продолжит работать
+  }
   const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
   window._sb=sb;
 
