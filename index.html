@@ -205,8 +205,15 @@ select option{background:#fff;}
   const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
   window._sb=sb;
 
-  // VPS URL — всегда HTTPS через бот-домен или fallback на IP
-  function getVpsUrl(){ return (localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001').replace(/\/$/,''); }
+  // VPS URL — на Vercel используем /bot-api через rewrites (обход Mixed Content HTTPS→HTTP).
+  // На dev (file:// или localhost) — прямой адрес.
+  function getVpsUrl(){
+    const override = localStorage.getItem('igs_railway_url');
+    if (override && override.trim()) return override.replace(/\/$/,'');
+    // Автовыбор: если на Vercel (HTTPS) — прокси, иначе напрямую
+    const isHttps = location.protocol === 'https:';
+    return isHttps ? '/bot-api' : 'http://45.136.58.180:3001';
+  }
 
   // ── Supabase: загрузка заявок (прямой HTTPS → Supabase) ──
   // Маппер: БД bot_leads (lowercase) → ожидаемый UI-формат (CamelCase)
@@ -461,13 +468,13 @@ select option{background:#fff;}
   <!-- Токены -->
   <div class="card" style="margin-bottom:14px;">
     <div class="ct" style="justify-content:space-between;margin-bottom:14px;">
-      <span>Использование токенов Claude</span>
+      <span>Использование токенов Gemini</span>
       <button class="btn btn-g" style="padding:4px 11px;font-size:12px;" onclick="loadTokenStats()">Обновить</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
       <div class="sc"><div class="sc-label">Сегодня токенов</div><div class="sc-val" style="color:var(--info)" id="tok-today">—</div><div class="sc-sub" id="tok-today-cost">$0.0000</div></div>
       <div class="sc"><div class="sc-label">За месяц</div><div class="sc-val" style="color:var(--purple)" id="tok-month">—</div><div class="sc-sub" id="tok-month-cost">$0.00</div></div>
-      <div class="sc"><div class="sc-label">Всего вызовов</div><div class="sc-val" id="tok-calls">—</div><div class="sc-sub">запросов к Claude</div></div>
+      <div class="sc"><div class="sc-label">Всего вызовов</div><div class="sc-val" id="tok-calls">—</div><div class="sc-sub">запросов к Gemini</div></div>
       <div class="sc"><div class="sc-label">Лимит месяца</div><div class="sc-val" id="tok-limit-pct" style="color:var(--accent)">—%</div><div class="sc-sub" id="tok-limit-sub">использовано</div></div>
     </div>
     <!-- Прогресс-бар лимита -->
@@ -485,7 +492,7 @@ select option{background:#fff;}
       <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Месячный лимит:</span>
       <input type="number" id="tok-limit-input" placeholder="1000000" class="mono" style="width:140px;padding:6px 10px;font-size:12.5px;">
       <button class="btn btn-g" style="padding:6px 13px;font-size:12.5px;" onclick="setTokenLimit()">Сохранить</button>
-      <span style="font-size:11.5px;color:var(--muted);">Sonnet 4: $3/1M input · $15/1M output</span>
+      <span style="font-size:11.5px;color:var(--muted);">Gemini 2.5 Flash: $0.30/1M input · $2.50/1M output</span>
     </div>
   </div>
   <div class="card">
@@ -551,7 +558,7 @@ select option{background:#fff;}
 
 <!-- ══ TEST CHAT ══ -->
 <div class="page" id="page-testchat">
-  <div class="ph"><div class="ph-title">Тестовый чат</div><div class="ph-sub">Реальный Claude API · виден вызов функций · промпт из настроек</div></div>
+  <div class="ph"><div class="ph-title">Тестовый чат</div><div class="ph-sub">Реальный бот на VPS · виден вызов функций · промпт из настроек</div></div>
   <div class="chat-wrap" style="height:500px;">
     <div class="chat-header">
       <div><div class="chat-title">Тест · IGS Outdoor Bot</div><div class="chat-sub" id="test-status">Реальный бот на VPS · Gemini+OpenRouter · калькулятор · RAG</div></div>
@@ -561,7 +568,7 @@ select option{background:#fff;}
       </div>
     </div>
     <div class="chat-msgs" id="test-msgs">
-      <div class="msg system">Это тестовый чат с реальным Claude API. Пиши как клиент — бот ответит через твой промпт и покажет какие функции вызвал.</div>
+      <div class="msg system">Это тестовый чат с реальным ботом на VPS (Gemini 2.5 + OpenRouter fallback). Пиши как клиент — увидишь ответ и какие функции бот вызвал.</div>
     </div>
     <div class="chat-input-row">
       <input class="chat-input" placeholder="Напиши как клиент..." id="test-input" onkeydown="if(event.key==='Enter')sendTestMsg()">
@@ -632,25 +639,9 @@ async function loadLivePrompt(){
     <div class="brow"><button class="btn btn-teal" onclick="checkVps()">Проверить соединение</button></div>
   </div>
   <div class="card">
-    <div class="ct">Claude API Key (для тестового чата)</div>
-    <div class="field">
-      <label>Claude API Key</label>
-      <input type="password" class="mono" id="claude-key-local" placeholder="sk-ant-api03-...">
-      <div class="fhint">Хранится только в браузере · используется только для тестового чата</div>
-    </div>
-    <div class="field">
-      <label>Модель</label>
-      <select id="claude-model-local">
-        <option value="claude-sonnet-4-20250514" selected>Claude Sonnet 4 — рекомендуется</option>
-        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — быстрее/дешевле</option>
-      </select>
-    </div>
-    <div class="brow">
-      <button class="btn btn-p" onclick="saveLocalKeys()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить локально</button>
-      <button class="btn btn-teal" onclick="testClaudeKey()">Проверить Claude</button>
-    </div>
-    <div style="margin-top:12px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--accent);">
-      Реальные API ключи (Claude, OpenAI, Telegram, Firebase) вставляются в VPS .env файл — не сюда. Здесь только для тестового чата.
+    <div class="ct">Тестовый чат</div>
+    <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--accent);">
+      Тестовый чат работает через реальный бот на VPS (Gemini 2.5 Flash + OpenRouter fallback). Локальные API-ключи не нужны. Все реальные ключи (Gemini, OpenRouter, Green API, Supabase) — в <code>/root/igs-bot/.env</code> или в разделе «API Ключи».
     </div>
   </div>
 </div>
@@ -1012,7 +1003,11 @@ function setFb(ok){
 }
 
 // ── Railway API ───────────────────────────────────────────────────────────────
-function getRailwayUrl(){ return (localStorage.getItem('igs_railway_url')||'http://45.136.58.180:3001').replace(/\/$/,''); }
+function getRailwayUrl(){
+  const override = localStorage.getItem('igs_railway_url');
+  if (override && override.trim()) return override.replace(/\/$/,'');
+  return location.protocol === 'https:' ? '/bot-api' : 'http://45.136.58.180:3001';
+}
 function saveRailwayUrl(){
   const val = $('railway-url')?.value||'';
   localStorage.setItem('igs_railway_url', val);
