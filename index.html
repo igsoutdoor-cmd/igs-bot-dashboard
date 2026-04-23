@@ -391,14 +391,6 @@ select option{background:#fff;}
       Тестовый чат
     </button>
     <div class="ns">Настройка</div>
-    <button class="ni" onclick="go('functions',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-      Функции
-    </button>
-    <button class="ni" onclick="go('rules',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Правила
-    </button>
     <button class="ni" onclick="go('prompt',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       Промпт
@@ -407,18 +399,10 @@ select option{background:#fff;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
       API ключи
     </button>
-    <button class="ni" onclick="go('features',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-      Возможности
-    </button>
     <div class="ns">Система</div>
     <button class="ni" onclick="go('connect',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/></svg>
       Подключение
-    </button>
-    <button class="ni" onclick="go('constructor',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/><path d="M15 5l3 3"/></svg>
-      Конструктор
     </button>
     <button class="ni" onclick="go('learning',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -520,7 +504,6 @@ select option{background:#fff;}
         <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('all')">Все</button>
         <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('hot')">🔥 Горячие</button>
         <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="filterLeads('escalated')">⚠ Менеджер</button>
-        <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="addTestLead()">+ Тест</button>
       </div>
     </div>
     <div style="overflow-x:auto;"><table class="lt"><thead><tr><th>Клиент</th><th>Телефон</th><th>Конструкция</th><th>Адрес</th><th>Размеры</th><th>Замер</th><th>Этап</th><th>Статус</th></tr></thead><tbody id="leads-body"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px;">Загрузка...</td></tr></tbody></table></div>
@@ -597,180 +580,44 @@ select option{background:#fff;}
   </div>
 </div>
 
-<!-- ══ FUNCTIONS ══ -->
-<div class="page" id="page-functions">
-  <div class="ph"><div class="ph-title">Функции бота</div><div class="ph-sub">Вызываются автоматически · настройки → Supabase → сервер</div></div>
-  <div class="fc enabled" id="fc-save">
-    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('save',this)"><span class="ts-"></span></label><div class="fname">save_user_data</div><span class="fpb">7 параметров</span><span class="b b-g">Активна</span></div>
-    <div class="fdesc">Сохраняет заявку в Firebase → Custom API → Telegram. Вызывается только когда собраны реальные данные из диалога.</div>
-    <div class="fpl">
-      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Инструкция</span></div>
-      <div class="fpr"><span class="pn">Name</span><span class="pt">string</span><span class="pd">Имя клиента из подписи WhatsApp</span></div>
-      <div class="fpr"><span class="pn">Location</span><span class="pt">string</span><span class="pd">Адрес объекта</span></div>
-      <div class="fpr"><span class="pn">Dimensions</span><span class="pt">string</span><span class="pd">Размеры: длина × ширина × высота</span></div>
-      <div class="fpr"><span class="pn">Construction_Type</span><span class="pt">string</span><span class="pd">Тип конструкции</span></div>
-      <div class="fpr"><span class="pn">Measurement_Date_Time</span><span class="pt">string</span><span class="pd">Дата и время замера</span></div>
-      <div class="fpr"><span class="pn">Stage</span><span class="pt">enum</span><span class="pd">горячий · тёплый · холодный</span></div>
-      <div class="fpr"><span class="pn">phone</span><span class="pt">string</span><span class="pd">Номер телефона WhatsApp</span></div>
-    </div>
-  </div>
-  <div class="fc enabled" id="fc-image">
-    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('image',this)"><span class="ts-"></span></label><div class="fname">Image</div><span class="fpb">2 параметра</span><span class="b b-g">Активна</span></div>
-    <div class="fdesc">Срабатывает СРАЗУ при получении фото или видео от клиента. Создаёт заявку со статусом photo и уведомляет менеджера.</div>
-    <div class="fpl">
-      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Описание</span></div>
-      <div class="fpr"><span class="pn">media_url</span><span class="pt">string</span><span class="pd">Описание медиафайла</span></div>
-      <div class="fpr"><span class="pn">caption</span><span class="pt">string</span><span class="pd">Подпись от клиента</span></div>
-    </div>
-  </div>
-  <div class="fc escalate" id="fc-esc">
-    <div class="fh"><label class="tog" style="margin:0;"><input type="checkbox" checked onchange="toggleFc('esc',this)"><span class="ts-"></span></label><div class="fname">escalate_to_human</div><span class="fpb">1 параметр</span><span class="b b-y">Приоритет</span></div>
-    <div class="fdesc">Клиент просит живого менеджера или перезвонить — бот замолкает, заявка → Supabase → Telegram со статусом escalated.</div>
-    <div class="fpl">
-      <div class="fpr hd"><span>Параметр</span><span>Тип</span><span>Описание</span></div>
-      <div class="fpr"><span class="pn">reason</span><span class="pt">string</span><span class="pd">Что именно сказал клиент</span></div>
-    </div>
-    <div style="margin-top:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--warn);">После эскалации диалог записывается в Supabase paused_chats — бот не отвечает этому клиенту с любого устройства.</div>
-  </div>
-  <div class="brow"><button class="btn btn-p" onclick="saveFunctions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button></div>
-</div>
-
-<!-- ══ PROMPT ══ -->
-<!-- ══ RULES ══ -->
-<div class="page" id="page-rules">
-  <div class="ph"><div class="ph-title">Правила бота</div><div class="ph-sub">Жёсткие ограничения · гибкость · экономия токенов</div></div>
-
-  <!-- Статус соответствия правилам -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
-    <div class="sc"><div class="sc-label">Соответствие правилам</div><div class="sc-val" style="color:var(--accent)" id="rules-compliance">—%</div><div class="sc-sub">из последних диалогов</div></div>
-    <div class="sc"><div class="sc-label">Нарушений правил</div><div class="sc-val" style="color:var(--danger)" id="rules-violations">0</div><div class="sc-sub">зафиксировано</div></div>
-    <div class="sc"><div class="sc-label">Гибкость бота</div><div class="sc-val" style="color:var(--info)" id="rules-flex-val">50%</div><div class="sc-sub">баланс: промпт ↔ импровиз</div></div>
-  </div>
-
-  <!-- Гибкость бота -->
-  <div class="card">
-    <div class="ct" style="margin-bottom:14px;">Гибкость бота</div>
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
-      <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Строго по промпту</span>
-      <input type="range" id="flex-slider" min="0" max="100" value="50" style="flex:1;" oninput="updateFlexLabel(this.value)">
-      <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;">Свободная импровизация</span>
-    </div>
-    <div style="text-align:center;margin-bottom:14px;">
-      <span id="flex-label" style="font-size:13px;color:var(--info);font-weight:600;">Сбалансированный режим (50%)</span>
-    </div>
-    <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--muted);margin-bottom:14px;" id="flex-desc">
-      Бот старается следовать промпту но может адаптироваться к нестандартным ситуациям.
-    </div>
-    <button class="btn btn-p" onclick="saveFlexibility()">Сохранить гибкость</button>
-  </div>
-
-  <!-- Экономия токенов -->
-  <div class="card">
-    <div class="ct" style="margin-bottom:14px;">Экономия токенов</div>
-    <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:14px;">
-      ⚠️ Текущий расход ~$0.007/диалог. При 100 диалогах/день = $21/мес. Включи экономию!
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-        <input type="checkbox" id="eco-short" onchange="saveEconomy()">
-        <div><div style="font-size:13.5px;font-weight:600;">Короткие ответы</div><div style="font-size:12px;color:var(--muted);">Бот отвечает максимум 2-3 предложения. Экономия ~30%</div></div>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-        <input type="checkbox" id="eco-history" onchange="saveEconomy()">
-        <div><div style="font-size:13.5px;font-weight:600;">Короткая история (5 сообщений)</div><div style="font-size:12px;color:var(--muted);">Бот помнит только 5 последних сообщений вместо 20. Экономия ~60%</div></div>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-        <input type="checkbox" id="eco-cache" onchange="saveEconomy()">
-        <div><div style="font-size:13.5px;font-weight:600;">Кэширование промпта</div><div style="font-size:12px;color:var(--muted);">Промпт не пересылается каждый раз. Экономия ~40%</div></div>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-        <input type="checkbox" id="eco-haiku" onchange="saveEconomy()">
-        <div><div style="font-size:13.5px;font-weight:600;">Использовать Claude Haiku</div><div style="font-size:12px;color:var(--muted);">В 20 раз дешевле Sonnet. Качество немного ниже. Экономия ~95%</div></div>
-      </label>
-    </div>
-    <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--accent);margin-bottom:14px;" id="eco-estimate">
-      Расчётная экономия: 0% · ~$0.007/диалог
-    </div>
-    <button class="btn btn-p" onclick="saveEconomy()">Применить настройки экономии</button>
-  </div>
-
-  <!-- Жёсткие правила -->
-  <div class="card">
-    <div class="ct" style="justify-content:space-between;margin-bottom:14px;">
-      <span>Жёсткие правила</span>
-      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="addRule()">+ Добавить</button>
-    </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Бот НИКОГДА не нарушает эти правила — они вшиты в промпт на уровне системы</div>
-    <div id="rules-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-      <!-- Правила загружаются динамически -->
-    </div>
-    <button class="btn btn-p" onclick="saveRules()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Сохранить правила
-    </button>
-  </div>
-
-  <!-- Баланс Claude API -->
-  <div class="card">
-    <div class="ct" style="margin-bottom:14px;">Баланс Claude API</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div class="sc"><div class="sc-label">Потрачено сегодня</div><div class="sc-val" id="bal-today">$0.00</div><div class="sc-sub" id="bal-today-tokens">0 токенов</div></div>
-      <div class="sc"><div class="sc-label">Потрачено за месяц</div><div class="sc-val" style="color:var(--warn)" id="bal-month">$0.00</div><div class="sc-sub" id="bal-month-tokens">0 токенов</div></div>
-    </div>
-    <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;">
-        <span>Месячный лимит</span>
-        <span id="bal-pct">0%</span>
-      </div>
-      <div style="background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;">
-        <div id="bal-bar" style="height:100%;background:var(--accent);border-radius:6px;width:0%;transition:width .5s;"></div>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
-      <input type="number" id="bal-limit" placeholder="Лимит токенов/мес" class="mono" style="flex:1;padding:7px 10px;font-size:13px;">
-      <button class="btn btn-g" onclick="setBalLimit()">Установить лимит</button>
-    </div>
-    <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--muted);">
-      Пополнить баланс Claude: <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:var(--accent);">console.anthropic.com/settings/billing</a>
-    </div>
-    <button class="btn btn-teal" style="margin-top:10px;" onclick="loadBalanceStats()">Обновить статистику</button>
-  </div>
-</div>
-
+<!-- ══ PROMPT (READ-ONLY — настоящий HARD_RULES в коде бота) ══ -->
 <div class="page" id="page-prompt">
-  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Сохраняется в Supabase → VPS подхватывает автоматически</div></div>
+  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Живой промпт из VPS · read-only · редактировать через правки HARD_RULES в коде бота</div></div>
+  <div class="card" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--warn);font-weight:600;margin-bottom:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Правка промпта из UI отключена
+    </div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;">
+      Настоящий промпт собирается на VPS из 3 источников:<br>
+      <b>1. HARD_RULES</b> — жёсткие правила в коде (<code>/root/igs-bot/index.js</code>)<br>
+      <b>2. Obsidian сценарии</b> — инжектируются через RAG (pgvector)<br>
+      <b>3. Актуальные цены</b> — автоматически из Supabase <code>prices</code><br><br>
+      Редактирование из этого UI перезаписало бы только малую часть (<code>basePrompt</code>) и поломало бы логику. Чтобы изменить промпт — редактируй HARD_RULES в коде или Obsidian-сценарии.
+    </div>
+  </div>
   <div class="card">
-    <div class="ct">Личность бота</div>
-    <div class="field"><label>Имя бота</label><input type="text" value="Ассистент IGS Outdoor" id="bot-name"></div>
-    <div class="frow">
-      <div class="field"><label>Язык</label><select id="lang"><option value="auto" selected>Авто (рус/каз)</option><option value="ru">Русский</option><option value="kz">Казахский</option></select></div>
-      <div class="field"><label>Тональность</label><select id="tone"><option value="friendly" selected>Дружелюбная</option><option value="formal">Официальная</option></select></div>
+    <div class="ct" style="justify-content:space-between;">
+      <span>Актуальный промпт с VPS (только для просмотра)</span>
+      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="loadLivePrompt()">🔄 Обновить</button>
     </div>
-    <div class="divider"></div>
     <div class="field">
-      <label>Системный промпт</label>
-      <textarea id="system-prompt" oninput="updateCount()">Ты — вежливый ассистент компании IGS Outdoor (Алматы, Казахстан).
-Компания: биоклиматические перголы, тентовые перголы Toscana, слайдинг, гильотина, zip-шторы, маркизы.
-
-ЗАДАЧА: принять обращение, выяснить потребность, получить фото, сохранить заявку.
-ЯЗЫК: отвечай на языке клиента — русский или казахский.
-
-ФУНКЦИИ:
-- save_user_data: когда собрал Construction_Type + Stage
-- Image: СРАЗУ при получении фото/видео
-- escalate_to_human: если клиент просит менеджера или перезвонить
-
-ЭТАПЫ: горячий=просит замер · тёплый=прислал фото/размеры · холодный=интересуется
-
-НЕ ДАВАЙ ЦЕНЫ. Замер бесплатный — предлагай активно.</textarea>
-      <div class="ccount"><span id="char-count">0</span> символов</div>
-    </div>
-    <div class="brow">
-      <button class="btn btn-p" onclick="savePrompt()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Сохранить</button>
-      <button class="btn btn-g" onclick="pushPromptToVps()">→ Применить на VPS</button>
+      <textarea id="system-prompt" readonly style="min-height:420px;font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--bg3);cursor:default;" oninput="updateCount()" placeholder="Нажми &quot;Обновить&quot; для загрузки актуального промпта..."></textarea>
+      <div class="ccount"><span id="char-count">0</span> символов (живой промпт с VPS)</div>
     </div>
   </div>
 </div>
+
+<script>
+async function loadLivePrompt(){
+  try {
+    const data = await railwayFetch('/api/prompt-preview');
+    const ta = document.getElementById('system-prompt');
+    if(ta){ ta.value = data.prompt || '(пусто)'; if(typeof updateCount==='function') updateCount(); }
+    if(typeof toast==='function') toast('Промпт загружен с VPS');
+  } catch(e){ if(typeof toast==='function') toast('VPS: '+e.message,'err'); }
+}
+</script>
 
 <!-- ══ KEYS ══ -->
 <div class="page" id="page-keys">
@@ -804,66 +651,6 @@ select option{background:#fff;}
     </div>
     <div style="margin-top:12px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius-sm);padding:11px 13px;font-size:12.5px;color:var(--accent);">
       Реальные API ключи (Claude, OpenAI, Telegram, Firebase) вставляются в VPS .env файл — не сюда. Здесь только для тестового чата.
-    </div>
-  </div>
-</div>
-
-<!-- ══ FEATURES ══ -->
-<div class="page" id="page-features">
-  <div class="ph"><div class="ph-title">Возможности</div><div class="ph-sub">Сохраняются в Firebase · Railway читает при каждом сообщении</div></div>
-  <div class="card">
-    <div class="ct">Функции</div>
-    <div class="tr"><div class="ti"><div class="tn">Распознавание голосовых</div><div class="td">OpenAI Whisper API</div></div><label class="tog"><input type="checkbox" checked id="f-voice"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Анализ фотографий</div><div class="td">Claude Vision — описывает объект и задаёт вопросы</div></div><label class="tog"><input type="checkbox" checked id="f-photo"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Эскалация к менеджеру</div><div class="td">escalate_to_human + Telegram + пауза диалога в Firebase</div></div><label class="tog"><input type="checkbox" checked id="f-esc"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Накопительная история</div><div class="td">Диалог хранится в Firebase — не теряется при перезапуске</div></div><label class="tog"><input type="checkbox" checked id="f-mem"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Автопауза ночью</div><div class="td">23:00–08:00 Алматы (UTC+5)</div></div><label class="tog"><input type="checkbox" checked id="f-night"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Определение этапа (Stage)</div><div class="td">горячий / тёплый / холодный автоматически</div></div><label class="tog"><input type="checkbox" checked id="f-stage"><span class="ts-"></span></label></div>
-    <div class="tr"><div class="ti"><div class="tn">Антиспам</div><div class="td">Игнорировать сообщения с интервалом < 2 сек</div></div><label class="tog"><input type="checkbox" checked id="f-spam"><span class="ts-"></span></label></div>
-    <div class="brow"><button class="btn btn-p" onclick="saveFeatures()">Сохранить</button></div>
-  </div>
-  <div class="card">
-    <div class="ct">Лимиты</div>
-    <div class="frow">
-      <div class="field"><label>Макс. токенов</label><input type="text" value="1024" id="max-tokens"></div>
-      <div class="field"><label>История (сообщений)</label><input type="text" value="20" id="hist-limit"></div>
-    </div>
-    <div class="frow">
-      <div class="field">
-        <label>Задержка ответа (мс)</label>
-        <input type="number" value="1500" id="reply-delay" min="0" max="15000" oninput="updateDelayLabel()">
-        <div class="fhint" id="delay-hint">Пауза 1.5 сек перед ответом — выглядит естественно</div>
-      </div>
-      <div class="field">
-        <label style="display:flex;align-items:center;gap:8px;">
-          <input type="checkbox" id="dynamic-delay">
-          Динамическая задержка (имитация набора текста)
-        </label>
-        <div class="fhint">+50мс на каждый символ ответа, макс. 8 сек — бот "печатает" как живой человек</div>
-      </div>
-      <div class="field"><label>Антиспам порог (мс)</label><input type="text" value="2000" id="spam-ms"></div>
-    </div>
-    <div class="divider"></div>
-    <div class="ct">🎩 Тональность и официальность</div>
-    <div class="field">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <label style="margin:0;">Уровень официальности</label>
-        <span style="font-size:13px;font-weight:700;color:var(--accent);" id="formality-val">30%</span>
-      </div>
-      <input type="range" id="formality-slider" min="0" max="100" value="30" step="5"
-        oninput="updateFormalityLabel(this.value)"
-        style="width:100%;accent-color:var(--accent);cursor:pointer;">
-      <div style="margin-top:8px;padding:10px 13px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent);">
-        <div style="font-size:13px;font-weight:600;color:var(--text);" id="formality-label">Дружелюбный</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px;" id="formality-desc">Тёплый, живой стиль — хороший менеджер в WhatsApp</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px;padding:0 2px;">
-        <span>😊 Неформально</span><span>🤝 Дружелюбно</span><span>💼 Официально</span><span>🎩 Строго</span>
-      </div>
-    </div>
-    <div class="brow">
-      <button class="btn btn-p" onclick="saveFeatures()">Сохранить</button>
-      <button class="btn btn-g" onclick="saveFormalityOnly()">Применить тональность →</button>
     </div>
   </div>
 </div>
@@ -907,65 +694,6 @@ select option{background:#fff;}
 
 <!-- ══ LOGS ══ -->
 <!-- ══ LEARNING ══ -->
-<!-- ══ CONSTRUCTOR ══ -->
-<div class="page" id="page-constructor">
-  <div class="ph"><div class="ph-title">Конструктор промпта</div><div class="ph-sub">Общайся с Claude — он поможет создать промпт для бота и применит его одной кнопкой</div></div>
-
-  <div style="display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start;">
-
-    <!-- Чат с Claude -->
-    <div class="chat-wrap" style="height:560px;">
-      <div class="chat-header">
-        <div>
-          <div class="chat-title">Чат с Claude — конструктор бота</div>
-          <div class="chat-sub" id="con-status">Опиши своего бота — Claude поможет создать промпт</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="clearConstructor()">Очистить</button>
-          <button class="btn btn-teal" style="padding:5px 11px;font-size:12px;" onclick="startConstructor()">Начать заново</button>
-        </div>
-      </div>
-      <div class="chat-msgs" id="con-msgs">
-        <div class="msg system">Привет! Я помогу создать промпт для твоего AI бота. Расскажи: какой это бизнес, что делает бот, как должен общаться с клиентами?</div>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="con-input" placeholder="Опиши бизнес, задачи бота, стиль общения..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendConstructorMsg()">
-        <button class="btn btn-p" onclick="sendConstructorMsg()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Панель промпта -->
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div class="card" style="padding:18px;">
-        <div class="ct" style="margin-bottom:12px;">Сгенерированный промпт</div>
-        <textarea id="con-prompt-result" style="min-height:320px;font-size:12.5px;line-height:1.7;" placeholder="Здесь появится промпт после того как Claude его сгенерирует..."></textarea>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-p" style="flex:1;justify-content:center;" onclick="applyConstructorPrompt()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Применить к боту
-          </button>
-          <button class="btn btn-g" onclick="copyConstructorPrompt()">Копировать</button>
-        </div>
-      </div>
-
-      <div class="card" style="padding:18px;background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.2);">
-        <div class="ct" style="color:var(--purple);margin-bottom:10px;">Быстрые команды</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('improve')">✨ Улучшить текущий промпт</button>
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('kazakh')">🇰🇿 Усилить казахский язык</button>
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('objections')">💬 Больше работы с возражениями</button>
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('upsell')">💰 Добавить логику допродаж</button>
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('speed')">⚡ Сделать промпт короче</button>
-          <button class="btn btn-g" style="justify-content:flex-start;font-size:12.5px;" onclick="useTemplate('custom')">✏️ Свой запрос</button>
-        </div>
-        <div style="margin-top:12px;font-size:12px;color:var(--muted);">Claude уже знает всё об IGS Outdoor — просто скажи что изменить</div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="page" id="page-learning">
   <div class="ph"><div class="ph-title">Обучение бота</div><div class="ph-sub">Оценивай диалоги → бот учится на следующих разговорах</div></div>
 
