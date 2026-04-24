@@ -512,6 +512,10 @@ select option{background:#fff;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/></svg>
       Подключение
     </button>
+    <button class="ni" onclick="go('scenarios',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M9 6h6M6 9v6"/></svg>
+      Сценарии<span class="ni-badge b b-g" id="nav-scen-cnt">0</span>
+    </button>
     <button class="ni" onclick="go('learning',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       Обучение<span class="ni-badge b b-p" id="nav-feedback-cnt">0</span>
@@ -871,6 +875,107 @@ async function loadLivePrompt(){
   </div>
 </div>
 
+<!-- ══ СЦЕНАРИИ ══ -->
+<div class="page" id="page-scenarios">
+  <div class="ph">
+    <div class="ph-title">Сценарии диалога</div>
+    <div class="ph-sub">База знаний бота · он берёт СУТЬ и адаптирует под вежливую речь клиенту</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="ct" style="justify-content:space-between;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <span>Всего: <b id="scen-total">0</b></span>
+        <select id="scen-filter" onchange="renderScenarios()" style="padding:6px 10px;">
+          <option value="">Все категории</option>
+          <option value="marquise">Маркизы</option>
+          <option value="pergola">Перголы</option>
+          <option value="glazing">Остекление</option>
+          <option value="zip">Zip-шторы</option>
+          <option value="decking">Терр.доска</option>
+          <option value="railings">Перила</option>
+          <option value="mounting">Монтаж</option>
+          <option value="pricing">Цены/оплата</option>
+          <option value="objection">Возражения</option>
+          <option value="seasonal">Сезонность</option>
+          <option value="showroom">Шоурум</option>
+          <option value="flow">Флоу</option>
+        </select>
+        <input id="scen-search" placeholder="Поиск по тексту..." oninput="renderScenarios()" style="padding:6px 10px;min-width:220px;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-g" onclick="toggleScenView()" id="scen-view-btn">Граф</button>
+        <button class="btn btn-p" onclick="openScenEditor(null)">+ Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сплит: слева дерево, справа детали -->
+  <div id="scen-list-view" style="display:grid;grid-template-columns:1fr;gap:12px;">
+    <div id="scen-list" class="card" style="padding:0;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+
+  <!-- Граф (простой SVG из категорий) -->
+  <div id="scen-graph-view" style="display:none;">
+    <div class="card">
+      <div class="ct">Дерево категорий</div>
+      <div id="scen-graph" style="overflow-x:auto;padding:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка редактора сценария -->
+<div id="scen-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
+  <div class="card" style="max-width:620px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div class="ct" style="justify-content:space-between;">
+      <span id="scen-modal-title">Новый сценарий</span>
+      <button class="btn btn-g" onclick="closeScenModal()">×</button>
+    </div>
+    <div class="field"><label>ID (уникальный ключ, snake_case)</label><input id="scen-id" class="mono" placeholder="marquise_custom_vip"></div>
+    <div class="frow">
+      <div class="field"><label>Категория</label>
+        <select id="scen-category">
+          <option value="marquise">Маркизы</option>
+          <option value="pergola">Перголы</option>
+          <option value="glazing">Остекление</option>
+          <option value="zip">Zip-шторы</option>
+          <option value="decking">Терр.доска</option>
+          <option value="railings">Перила</option>
+          <option value="mounting">Монтаж</option>
+          <option value="pricing">Цены</option>
+          <option value="objection">Возражения</option>
+          <option value="seasonal">Сезонность</option>
+          <option value="showroom">Шоурум</option>
+          <option value="flow">Флоу</option>
+        </select>
+      </div>
+      <div class="field"><label>Parent ID (если узел-ребёнок)</label><input id="scen-parent" class="mono" placeholder="marquise_root"></div>
+    </div>
+    <div class="field"><label>Заголовок</label><input id="scen-title" placeholder="Например: Маркиза для кафе"></div>
+    <div class="field">
+      <label>Ключевые слова (через запятую) — по ним бот поймёт какой сценарий брать</label>
+      <input id="scen-keywords" placeholder="маркиза, кафе, веранда">
+    </div>
+    <div class="field">
+      <label>Суть ответа (бот адаптирует под вежливую речь)</label>
+      <textarea id="scen-response" rows="5" placeholder="Опиши ключевые факты для бота. Например: Для кафе рекомендуем тяжёлую премиум-маркизу с LED. Устойчива к ветру, красивое вечернее освещение..."></textarea>
+    </div>
+    <div class="field">
+      <label>Уточняющие вопросы (необязательно)</label>
+      <textarea id="scen-options" rows="2" placeholder="Какая площадь веранды? Есть ли крепёж к стене?"></textarea>
+    </div>
+    <div class="field">
+      <label>Цена (необязательно)</label>
+      <input id="scen-price" placeholder="От 130 000 тг/м²">
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="saveScen()">Сохранить</button>
+      <button class="btn btn-d" onclick="deleteScen()" id="scen-delete-btn" style="display:none;">Удалить</button>
+      <button class="btn btn-g" onclick="closeScenModal()">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="page-logs">
   <div class="ph"><div class="ph-title">Логи</div><div class="ph-sub">Журнал дашборда · для Railway логов смотри в Railway → Logs</div></div>
   <div class="card">
@@ -1093,9 +1198,10 @@ function go(name,btn){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
   $('page-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
+  // Lazy-load on nav
+  if (name === 'scenarios' && typeof loadScenarios === 'function') loadScenarios();
   // Mobile: close sidebar after nav
   if(window.innerWidth <= 768) toggleSidebar(false);
-  // Scroll to top on mobile
   if(window.innerWidth <= 768) window.scrollTo({top:0,behavior:'instant'});
 }
 function toggleSidebar(force){
@@ -1641,6 +1747,175 @@ function toggleFc(name,cb){
 function clearLogs(){$('log-box').innerHTML='';addLog('✓ Очищено','lok');}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+// ─── Сценарии диалога ──────────────────────────────────────────────────────
+let _scenCache = [];
+let _scenEditId = null;
+let _scenViewMode = 'list'; // 'list' | 'graph'
+
+async function loadScenarios(){
+  try {
+    const r = await railwayFetch('/api/scenarios');
+    _scenCache = r.scenarios || [];
+    if ($('scen-total')) $('scen-total').textContent = _scenCache.length;
+    if ($('nav-scen-cnt')) $('nav-scen-cnt').textContent = _scenCache.length;
+    renderScenarios();
+  } catch(e) {
+    if ($('scen-list')) $('scen-list').innerHTML = '<div style="padding:20px;color:var(--muted);">Ошибка загрузки: '+e.message+'</div>';
+  }
+}
+
+const CAT_LABELS = {
+  marquise:'Маркизы', pergola:'Перголы', glazing:'Остекление', zip:'Zip-шторы',
+  decking:'Терр.доска', railings:'Перила', mounting:'Монтаж', pricing:'Цены',
+  objection:'Возражения', seasonal:'Сезонность', showroom:'Шоурум', flow:'Флоу'
+};
+
+function renderScenarios(){
+  const el = $('scen-list');
+  if (!el) return;
+  const filter = $('scen-filter') ? $('scen-filter').value : '';
+  const search = ($('scen-search') ? $('scen-search').value : '').toLowerCase();
+  let list = _scenCache.slice();
+  if (filter) list = list.filter(s => s.category === filter);
+  if (search) list = list.filter(s =>
+    (s.title||'').toLowerCase().includes(search) ||
+    (s.response_template||'').toLowerCase().includes(search) ||
+    (s.keywords||[]).some(k => String(k).toLowerCase().includes(search))
+  );
+  if (!list.length) { el.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center;">Пусто. Нажми «+ Добавить»</div>'; return; }
+  // Группировка по category, иерархия parent → children
+  const byCat = {};
+  for (const s of list) { (byCat[s.category] = byCat[s.category] || []).push(s); }
+  let html = '';
+  for (const cat of Object.keys(byCat)) {
+    html += `<div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.08em;">${CAT_LABELS[cat]||cat} · ${byCat[cat].length}</div>`;
+    const roots = byCat[cat].filter(s => !s.parent_id);
+    const kids = byCat[cat].filter(s => s.parent_id);
+    for (const r of roots) {
+      html += scenRow(r, 0);
+      for (const k of kids.filter(k => k.parent_id === r.id)) html += scenRow(k, 1);
+    }
+    // Orphans (parent не в этой подборке)
+    for (const k of kids.filter(k => !roots.find(r => r.id === k.parent_id))) html += scenRow(k, 1);
+  }
+  el.innerHTML = html;
+  if (_scenViewMode === 'graph') renderScenGraph();
+}
+
+function scenRow(s, depth) {
+  const pad = depth * 20;
+  const kw = (s.keywords||[]).slice(0,4).map(k=>`<span style="background:var(--bg3);padding:1px 7px;border-radius:10px;font-size:10.5px;margin-right:4px;">${esc(k)}</span>`).join('');
+  return `<div onclick='openScenEditor(${JSON.stringify(s.id)})' style="padding:10px 14px 10px ${14+pad}px;border-bottom:1px solid var(--border);cursor:pointer;">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;">${depth?'└ ':''}${esc(s.title||s.id)}</div>
+        <div style="font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc((s.response_template||'').slice(0,140))}</div>
+        <div style="margin-top:4px;">${kw}</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);">${esc(s.id)}</div>
+    </div>
+  </div>`;
+}
+
+function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+function toggleScenView(){
+  _scenViewMode = (_scenViewMode === 'list' ? 'graph' : 'list');
+  $('scen-list-view').style.display = _scenViewMode === 'list' ? 'grid' : 'none';
+  $('scen-graph-view').style.display = _scenViewMode === 'graph' ? 'block' : 'none';
+  $('scen-view-btn').textContent = _scenViewMode === 'list' ? 'Граф' : 'Список';
+  if (_scenViewMode === 'graph') renderScenGraph();
+}
+
+function renderScenGraph(){
+  const el = $('scen-graph');
+  if (!el) return;
+  // Простой SVG-граф: категории → их корневые узлы → дети
+  const cats = {};
+  for (const s of _scenCache) (cats[s.category] = cats[s.category] || []).push(s);
+  const CW = 260, CH = 32, CGAP = 14;
+  let html = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" style="display:block;">';
+  let y = 10;
+  for (const cat of Object.keys(cats).sort()) {
+    const roots = cats[cat].filter(s => !s.parent_id);
+    const kids = cats[cat].filter(s => s.parent_id);
+    // Category box
+    html += `<rect x="10" y="${y}" width="220" height="${CH}" rx="6" fill="var(--accent)" opacity="0.15" stroke="var(--accent)"/>`;
+    html += `<text x="20" y="${y+20}" fill="var(--accent)" font-weight="700" font-size="13">${esc(CAT_LABELS[cat]||cat)} (${cats[cat].length})</text>`;
+    let ry = y + CH + 6;
+    for (const r of roots) {
+      // Root box
+      html += `<rect x="260" y="${ry}" width="${CW}" height="${CH}" rx="6" fill="var(--bg3)" stroke="var(--border)"/>`;
+      html += `<text x="270" y="${ry+20}" font-size="12.5">${esc((r.title||r.id).slice(0,34))}</text>`;
+      html += `<line x1="230" y1="${y+CH/2}" x2="260" y2="${ry+CH/2}" stroke="var(--border)"/>`;
+      const myKids = kids.filter(k => k.parent_id === r.id);
+      let ky = ry;
+      for (const k of myKids) {
+        ky += CH + 6;
+        html += `<rect x="540" y="${ky}" width="${CW}" height="${CH}" rx="6" fill="var(--bg)" stroke="var(--border)"/>`;
+        html += `<text x="550" y="${ky+20}" font-size="12" fill="var(--muted)">${esc((k.title||k.id).slice(0,34))}</text>`;
+        html += `<line x1="${260+CW}" y1="${ry+CH/2}" x2="540" y2="${ky+CH/2}" stroke="var(--border)"/>`;
+      }
+      ry = Math.max(ry + CH + CGAP, ky + CH + 6);
+    }
+    y = Math.max(y + CH + 10, ry);
+  }
+  html += `</svg>`;
+  el.innerHTML = html;
+  el.querySelector('svg').setAttribute('height', String(y + 30));
+}
+
+function openScenEditor(id){
+  _scenEditId = id;
+  const modal = $('scen-modal');
+  const s = id ? _scenCache.find(x => x.id === id) : null;
+  $('scen-modal-title').textContent = s ? ('Сценарий: ' + s.id) : 'Новый сценарий';
+  $('scen-id').value = s ? s.id : '';
+  $('scen-id').disabled = !!s;
+  $('scen-category').value = s ? s.category : 'marquise';
+  $('scen-parent').value = s && s.parent_id || '';
+  $('scen-title').value = s ? s.title : '';
+  $('scen-keywords').value = s ? (s.keywords||[]).join(', ') : '';
+  $('scen-response').value = s ? s.response_template || '' : '';
+  $('scen-options').value = s ? s.options_prompt || '' : '';
+  $('scen-price').value = s ? s.price_info || '' : '';
+  $('scen-delete-btn').style.display = s ? 'inline-flex' : 'none';
+  modal.style.display = 'flex';
+}
+function closeScenModal(){ $('scen-modal').style.display = 'none'; }
+
+async function saveScen(){
+  const id = $('scen-id').value.trim();
+  if (!id) return toast('ID обязателен', 'warn');
+  const body = {
+    id,
+    parent_id: $('scen-parent').value.trim() || null,
+    category: $('scen-category').value,
+    title: $('scen-title').value.trim(),
+    keywords: $('scen-keywords').value.split(',').map(s=>s.trim()).filter(Boolean),
+    response_template: $('scen-response').value,
+    options_prompt: $('scen-options').value,
+    price_info: $('scen-price').value,
+  };
+  try {
+    await railwayFetch('/api/scenarios', { method:'POST', body: JSON.stringify(body) });
+    toast('Сценарий сохранён');
+    closeScenModal();
+    loadScenarios();
+  } catch(e) { toast('Ошибка: ' + e.message, 'err'); }
+}
+
+async function deleteScen(){
+  if (!_scenEditId) return;
+  if (!confirm('Скрыть этот сценарий? Он перестанет использоваться ботом.')) return;
+  try {
+    await railwayFetch('/api/scenarios/' + encodeURIComponent(_scenEditId), { method:'DELETE' });
+    toast('Сценарий скрыт');
+    closeScenModal();
+    loadScenarios();
+  } catch(e) { toast('Ошибка: ' + e.message, 'err'); }
+}
+
 async function init(){
   updateCount();
   applyState('active');
@@ -1667,6 +1942,8 @@ async function init(){
   if(railUrl) {
     addLog('↺ Подключение к VPS...', 'linf');
     setTimeout(checkVps, 1000);
+    // Предзагрузим сценарии в фоне, чтобы бейдж показал цифру
+    setTimeout(()=>{ if(typeof loadScenarios==='function') loadScenarios(); }, 2500);
   }
 
   if(key) if($('test-status')) $('test-status').textContent = 'Готов к тестированию';
