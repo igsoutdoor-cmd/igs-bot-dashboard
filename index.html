@@ -903,7 +903,10 @@ async function loadLivePrompt(){
         </select>
         <input id="scen-search" placeholder="Поиск по тексту..." oninput="renderScenarios()" style="padding:6px 10px;min-width:220px;">
       </div>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-teal" onclick="$('scen-try-modal').style.display='flex'">🧪 Попробовать</button>
+        <button class="btn btn-g" onclick="openScenImport()">📥 Импорт</button>
+        <button class="btn btn-g" onclick="exportScen()">📤 Экспорт</button>
         <button class="btn btn-g" onclick="toggleScenView()" id="scen-view-btn">Граф</button>
         <button class="btn btn-p" onclick="openScenEditor(null)">+ Добавить</button>
       </div>
@@ -926,15 +929,20 @@ async function loadLivePrompt(){
 
 <!-- Модалка редактора сценария -->
 <div id="scen-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
-  <div class="card" style="max-width:620px;width:100%;max-height:90vh;overflow-y:auto;">
+  <div class="card" style="max-width:680px;width:100%;max-height:92vh;overflow-y:auto;">
     <div class="ct" style="justify-content:space-between;">
       <span id="scen-modal-title">Новый сценарий</span>
       <button class="btn btn-g" onclick="closeScenModal()">×</button>
     </div>
-    <div class="field"><label>ID (уникальный ключ, snake_case)</label><input id="scen-id" class="mono" placeholder="marquise_custom_vip"></div>
+
+    <div class="frow">
+      <div class="field"><label>ID (snake_case)</label><input id="scen-id" class="mono" placeholder="marquise_custom_vip"></div>
+      <div class="field"><label>Порядок сортировки</label><input type="number" id="scen-sort" class="mono" placeholder="0" style="width:100%;"></div>
+    </div>
+
     <div class="frow">
       <div class="field"><label>Категория</label>
-        <select id="scen-category">
+        <select id="scen-category" onchange="refreshParentOptions()">
           <option value="marquise">Маркизы</option>
           <option value="pergola">Перголы</option>
           <option value="glazing">Остекление</option>
@@ -949,30 +957,102 @@ async function loadLivePrompt(){
           <option value="flow">Флоу</option>
         </select>
       </div>
-      <div class="field"><label>Parent ID (если узел-ребёнок)</label><input id="scen-parent" class="mono" placeholder="marquise_root"></div>
+      <div class="field"><label>Родительский узел</label>
+        <select id="scen-parent-select" onchange="document.getElementById('scen-parent').value=this.value">
+          <option value="">— нет (корневой)</option>
+        </select>
+        <input id="scen-parent" class="mono" placeholder="или введи ID вручную" style="margin-top:4px;">
+      </div>
     </div>
+
     <div class="field"><label>Заголовок</label><input id="scen-title" placeholder="Например: Маркиза для кафе"></div>
+
     <div class="field">
-      <label>Ключевые слова (через запятую) — по ним бот поймёт какой сценарий брать</label>
-      <input id="scen-keywords" placeholder="маркиза, кафе, веранда">
+      <label>Ключевые слова (через запятую) — по ним бот поймёт когда брать этот сценарий</label>
+      <input id="scen-keywords" placeholder="маркиза, кафе, веранда, ресторан">
+      <div class="fhint">Чем точнее ключевые слова — тем лучше бот найдёт нужный сценарий для запроса клиента.</div>
     </div>
+
     <div class="field">
-      <label>Суть ответа (бот адаптирует под вежливую речь)</label>
-      <textarea id="scen-response" rows="5" placeholder="Опиши ключевые факты для бота. Например: Для кафе рекомендуем тяжёлую премиум-маркизу с LED. Устойчива к ветру, красивое вечернее освещение..."></textarea>
+      <label>Суть ответа <span style="color:var(--accent);font-size:11px;">(бот адаптирует под вежливую речь)</span></label>
+      <textarea id="scen-response" rows="6" placeholder="Например: Для кафе рекомендуем тяжёлую премиум-маркизу с LED. Устойчива к ветру до 60 км/ч, красивое вечернее освещение. Ширина до 7м, вылет до 4м..."></textarea>
+      <div class="fhint">Пиши фактами. Бот сам переформулирует вежливо клиенту.</div>
     </div>
+
     <div class="field">
       <label>Уточняющие вопросы (необязательно)</label>
       <textarea id="scen-options" rows="2" placeholder="Какая площадь веранды? Есть ли крепёж к стене?"></textarea>
     </div>
+
     <div class="field">
-      <label>Цена (необязательно)</label>
-      <input id="scen-price" placeholder="От 130 000 тг/м²">
+      <label>Цена / прайс-инфо (необязательно)</label>
+      <input id="scen-price" placeholder="От 130 000 тг/м² под ключ с монтажом">
     </div>
-    <div class="brow">
-      <button class="btn btn-p" onclick="saveScen()">Сохранить</button>
-      <button class="btn btn-d" onclick="deleteScen()" id="scen-delete-btn" style="display:none;">Удалить</button>
+
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="scen-active" checked>
+        <span>Активен (бот использует в промпте)</span>
+      </label>
+    </div>
+
+    <div class="brow" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-p" onclick="saveScen()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Сохранить
+      </button>
+      <button class="btn btn-teal" onclick="duplicateScen()" id="scen-duplicate-btn" style="display:none;">📋 Дублировать</button>
+      <button class="btn btn-d" onclick="deleteScen()" id="scen-delete-btn" style="display:none;">🗑 Скрыть</button>
       <button class="btn btn-g" onclick="closeScenModal()">Отмена</button>
     </div>
+  </div>
+</div>
+
+<!-- Модалка массового импорта -->
+<div id="scen-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
+  <div class="card" style="max-width:700px;width:100%;max-height:92vh;overflow-y:auto;">
+    <div class="ct" style="justify-content:space-between;">
+      <span>Массовый импорт сценариев (JSON)</span>
+      <button class="btn btn-g" onclick="$('scen-import-modal').style.display='none'">×</button>
+    </div>
+    <div class="field">
+      <label>JSON-массив сценариев</label>
+      <textarea id="scen-import-text" rows="14" class="mono" style="font-size:11.5px;" placeholder='[
+  {
+    "id": "marquise_cafe",
+    "category": "marquise",
+    "parent_id": "marquise_heavy",
+    "title": "Маркиза для кафе-веранды",
+    "keywords": ["кафе","веранда","ресторан","бар"],
+    "response_template": "Для уличных кафе рекомендуем тяжёлую премиум-маркизу с LED...",
+    "price_info": "От 140 000 тг/м²"
+  }
+]'></textarea>
+      <div class="fhint">Поля: id, category, title — обязательны. Остальные — опционально. existing id → обновит.</div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="runScenImport()">Импортировать</button>
+      <button class="btn btn-g" onclick="$('scen-import-modal').style.display='none'">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка тест-прогона (клиент → какие сценарии подобраны + ответ бота) -->
+<div id="scen-try-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;align-items:center;justify-content:center;padding:20px;">
+  <div class="card" style="max-width:780px;width:100%;max-height:92vh;overflow-y:auto;">
+    <div class="ct" style="justify-content:space-between;">
+      <span>🧪 Попробовать — какие сценарии подберёт бот?</span>
+      <button class="btn btn-g" onclick="$('scen-try-modal').style.display='none'">×</button>
+    </div>
+    <div class="field">
+      <label>Сообщение от клиента</label>
+      <input id="scen-try-input" placeholder="Например: Сколько стоит биоклиматическая пергола 4×5 метров?">
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="runScenTry()">Подобрать сценарии</button>
+    </div>
+    <div id="scen-try-picked" style="margin-top:14px;"></div>
+    <div id="scen-try-bot" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -1872,13 +1952,25 @@ function renderScenGraph(){
   el.querySelector('svg').setAttribute('height', String(y + 30));
 }
 
+function refreshParentOptions(){
+  const cat = $('scen-category').value;
+  const sel = $('scen-parent-select');
+  if (!sel) return;
+  const candidates = _scenCache.filter(s => s.category === cat);
+  sel.innerHTML = '<option value="">— нет (корневой)</option>' +
+    candidates.map(s => `<option value="${esc(s.id)}">${esc(s.title || s.id)} [${esc(s.id)}]</option>`).join('');
+  const cur = $('scen-parent').value;
+  if (cur) sel.value = cur;
+}
+
 function openScenEditor(id){
   _scenEditId = id;
   const modal = $('scen-modal');
   const s = id ? _scenCache.find(x => x.id === id) : null;
-  $('scen-modal-title').textContent = s ? ('Сценарий: ' + s.id) : 'Новый сценарий';
+  $('scen-modal-title').textContent = s ? ('✎ ' + (s.title || s.id)) : '+ Новый сценарий';
   $('scen-id').value = s ? s.id : '';
   $('scen-id').disabled = !!s;
+  $('scen-sort').value = s ? (s.sort_order || 0) : 0;
   $('scen-category').value = s ? s.category : 'marquise';
   $('scen-parent').value = s && s.parent_id || '';
   $('scen-title').value = s ? s.title : '';
@@ -1886,7 +1978,10 @@ function openScenEditor(id){
   $('scen-response').value = s ? s.response_template || '' : '';
   $('scen-options').value = s ? s.options_prompt || '' : '';
   $('scen-price').value = s ? s.price_info || '' : '';
+  $('scen-active').checked = s ? (s.active !== false) : true;
   $('scen-delete-btn').style.display = s ? 'inline-flex' : 'none';
+  $('scen-duplicate-btn').style.display = s ? 'inline-flex' : 'none';
+  refreshParentOptions();
   modal.style.display = 'flex';
 }
 function closeScenModal(){ $('scen-modal').style.display = 'none'; }
@@ -1894,33 +1989,157 @@ function closeScenModal(){ $('scen-modal').style.display = 'none'; }
 async function saveScen(){
   const id = $('scen-id').value.trim();
   if (!id) return toast('ID обязателен', 'warn');
+  if (!/^[a-z0-9_]+$/.test(id)) return toast('ID: только a-z, 0-9, _', 'warn');
+  const title = $('scen-title').value.trim();
+  if (!title) return toast('Заголовок обязателен', 'warn');
+
   const body = {
     id,
     parent_id: $('scen-parent').value.trim() || null,
     category: $('scen-category').value,
-    title: $('scen-title').value.trim(),
+    title,
     keywords: $('scen-keywords').value.split(',').map(s=>s.trim()).filter(Boolean),
     response_template: $('scen-response').value,
     options_prompt: $('scen-options').value,
     price_info: $('scen-price').value,
+    sort_order: parseInt($('scen-sort').value) || 0,
+    active: $('scen-active').checked,
   };
   try {
     await railwayFetch('/api/scenarios', { method:'POST', body: JSON.stringify(body) });
-    toast('Сценарий сохранён');
+    toast('✓ Сохранено');
     closeScenModal();
     loadScenarios();
   } catch(e) { toast('Ошибка: ' + e.message, 'err'); }
 }
 
+async function duplicateScen(){
+  const oldId = _scenEditId;
+  if (!oldId) return;
+  const newId = prompt('Новый ID (snake_case):', oldId + '_copy');
+  if (!newId || !/^[a-z0-9_]+$/.test(newId)) return toast('ID: только a-z, 0-9, _', 'warn');
+  const body = {
+    id: newId,
+    parent_id: $('scen-parent').value.trim() || null,
+    category: $('scen-category').value,
+    title: $('scen-title').value.trim() + ' (копия)',
+    keywords: $('scen-keywords').value.split(',').map(s=>s.trim()).filter(Boolean),
+    response_template: $('scen-response').value,
+    options_prompt: $('scen-options').value,
+    price_info: $('scen-price').value,
+    sort_order: (parseInt($('scen-sort').value) || 0) + 1,
+    active: true,
+  };
+  try {
+    await railwayFetch('/api/scenarios', { method:'POST', body: JSON.stringify(body) });
+    toast('✓ Скопировано как ' + newId);
+    closeScenModal();
+    loadScenarios();
+    setTimeout(()=>openScenEditor(newId), 600);
+  } catch(e) { toast('Ошибка: ' + e.message, 'err'); }
+}
+
 async function deleteScen(){
   if (!_scenEditId) return;
-  if (!confirm('Скрыть этот сценарий? Он перестанет использоваться ботом.')) return;
+  if (!confirm('Скрыть сценарий "' + _scenEditId + '"?\nОн перестанет использоваться ботом. Восстановить можно через active=true.')) return;
   try {
     await railwayFetch('/api/scenarios/' + encodeURIComponent(_scenEditId), { method:'DELETE' });
     toast('Сценарий скрыт');
     closeScenModal();
     loadScenarios();
   } catch(e) { toast('Ошибка: ' + e.message, 'err'); }
+}
+
+// ── Import / Export ──
+function openScenImport(){
+  $('scen-import-text').value = '';
+  $('scen-import-modal').style.display = 'flex';
+}
+
+async function runScenImport(){
+  const raw = $('scen-import-text').value.trim();
+  if (!raw) return toast('Пусто', 'warn');
+  let arr;
+  try {
+    arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) arr = [arr];
+  } catch(e) { return toast('Невалидный JSON: ' + e.message, 'err'); }
+
+  let ok = 0, fail = 0;
+  for (const item of arr) {
+    if (!item.id || !item.category || !item.title) { fail++; continue; }
+    try {
+      await railwayFetch('/api/scenarios', { method:'POST', body: JSON.stringify(item) });
+      ok++;
+    } catch(e) { fail++; }
+  }
+  toast(`✓ Импорт: ${ok} OK, ${fail} FAIL`, fail ? 'warn' : 'info');
+  $('scen-import-modal').style.display = 'none';
+  loadScenarios();
+}
+
+function exportScen(){
+  const data = _scenCache.map(s => ({
+    id: s.id, parent_id: s.parent_id, category: s.category, title: s.title,
+    keywords: s.keywords, response_template: s.response_template,
+    options_prompt: s.options_prompt, price_info: s.price_info,
+    sort_order: s.sort_order, active: s.active,
+  }));
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'igs_scenarios_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Экспорт запущен (' + data.length + ' шт.)');
+}
+
+// ── Тест-прогон: "какие сценарии бот подберёт для этого запроса" ──
+async function runScenTry(){
+  const txt = ($('scen-try-input').value || '').trim();
+  if (!txt) return;
+  const pickedEl = $('scen-try-picked');
+  const botEl = $('scen-try-bot');
+  pickedEl.innerHTML = '<div style="color:var(--muted);font-size:13px;">Подбираю...</div>';
+  botEl.innerHTML = '';
+
+  // Локально подбираем (та же логика что и в боте: matching по keywords)
+  const lower = txt.toLowerCase();
+  const scored = _scenCache.map(s => {
+    let score = 0;
+    for (const k of (s.keywords||[])) if (lower.includes(String(k).toLowerCase())) score += 2;
+    if (s.title && lower.includes(String(s.title).toLowerCase().slice(0,10))) score += 1;
+    return { s, score };
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 5);
+
+  if (!scored.length) {
+    pickedEl.innerHTML = '<div style="padding:14px;background:var(--bg3);border-radius:6px;color:var(--muted);">Нет подходящих сценариев по ключевым словам. Бот ответит на общих знаниях.</div>';
+  } else {
+    pickedEl.innerHTML = `<div style="font-size:11.5px;text-transform:uppercase;color:var(--muted);letter-spacing:.08em;margin-bottom:8px;">Бот подберёт ${scored.length} сценариев:</div>` +
+      scored.map(x => `<div style="padding:10px 12px;background:rgba(37,211,102,.08);border-left:3px solid var(--accent);border-radius:4px;margin-bottom:6px;">
+        <div style="font-weight:700;font-size:13px;">${esc(x.s.title)} <span style="font-size:11px;color:var(--muted);font-weight:400;">[${esc(x.s.category)}] · score ${x.score}</span></div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px;">${esc((x.s.response_template||'').slice(0,220))}${(x.s.response_template||'').length>220?'…':''}</div>
+      </div>`).join('');
+  }
+
+  // Реальный прогон через test-chat
+  botEl.innerHTML = '<div style="color:var(--muted);font-size:13px;margin-top:10px;">Спрашиваю бота...</div>';
+  try {
+    const cid = 'scen_try_' + Date.now() + '@c.us';
+    await fetch(getVpsUrl() + '/api/test-chat?chatId=' + encodeURIComponent(cid), { method:'DELETE' }).catch(()=>{});
+    const r = await railwayFetch('/api/test-chat', { method:'POST', body: JSON.stringify({ message: txt, chatId: cid }) });
+    if (r.escalated) {
+      botEl.innerHTML = `<div style="padding:12px;background:rgba(239,68,68,.12);border-left:3px solid var(--danger);border-radius:4px;"><b style="color:var(--danger);">🛑 Эскалация:</b> ${esc(r.reason)}</div>`;
+    } else {
+      botEl.innerHTML = `<div style="margin-top:10px;"><div style="font-size:11.5px;text-transform:uppercase;color:var(--muted);letter-spacing:.08em;margin-bottom:6px;">Как ответит бот:</div>
+        <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;white-space:pre-wrap;font-size:13px;line-height:1.55;">${esc(r.reply||'(пусто)')}</div>
+        ${r.toolCalls?.length ? `<div style="margin-top:6px;font-size:11px;color:var(--muted);">🔧 Tools: ${r.toolCalls.map(t=>esc(t.name||t)).join(', ')}</div>` : ''}
+      </div>`;
+    }
+  } catch(e) {
+    botEl.innerHTML = '<div style="color:var(--danger);">Ошибка: ' + esc(e.message) + '</div>';
+  }
 }
 
 async function init(){
