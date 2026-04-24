@@ -1804,16 +1804,23 @@ function renderScenarios(){
 
 function scenRow(s, depth) {
   const pad = depth * 20;
-  const kw = (s.keywords||[]).slice(0,4).map(k=>`<span style="background:var(--bg3);padding:1px 7px;border-radius:10px;font-size:10.5px;margin-right:4px;">${esc(k)}</span>`).join('');
-  return `<div onclick='openScenEditor(${JSON.stringify(s.id)})' style="padding:10px 14px 10px ${14+pad}px;border-bottom:1px solid var(--border);cursor:pointer;">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+  const kw = (s.keywords||[]).map(k=>`<span style="background:var(--bg3);padding:2px 8px;border-radius:10px;font-size:10.5px;margin:0 4px 4px 0;display:inline-block;">${esc(k)}</span>`).join('');
+  const resp = esc(s.response_template || '(пусто)');
+  const opts = s.options_prompt ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(37,211,102,.06);border-left:3px solid var(--accent);border-radius:4px;font-size:12px;"><b style="color:var(--accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;">Уточнения</b><br>${esc(s.options_prompt)}</div>` : '';
+  const price = s.price_info ? `<div style="margin-top:6px;font-size:12px;color:var(--purple);"><b>Цена:</b> ${esc(s.price_info)}</div>` : '';
+  const parent = s.parent_id ? `<span style="font-size:10.5px;color:var(--muted);margin-left:6px;">↑ ${esc(s.parent_id)}</span>` : '';
+  return `<div style="padding:12px 14px 14px ${14+pad}px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px;">
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;">${depth?'└ ':''}${esc(s.title||s.id)}</div>
-        <div style="font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc((s.response_template||'').slice(0,140))}</div>
-        <div style="margin-top:4px;">${kw}</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:3px;">${depth?'└─ ':''}${esc(s.title||s.id)}${parent}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);">${esc(s.id)}</div>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);">${esc(s.id)}</div>
+      <button class="btn btn-g" style="padding:4px 11px;font-size:11.5px;flex-shrink:0;" onclick='openScenEditor(${JSON.stringify(s.id)})'>Редактировать</button>
     </div>
+    <div style="font-size:13px;line-height:1.55;color:var(--text);white-space:pre-wrap;word-break:break-word;background:var(--bg3);padding:10px 12px;border-radius:6px;">${resp}</div>
+    ${opts}
+    ${price}
+    ${kw ? `<div style="margin-top:8px;">${kw}</div>` : ''}
   </div>`;
 }
 
