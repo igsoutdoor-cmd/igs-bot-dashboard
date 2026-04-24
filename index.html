@@ -499,10 +499,6 @@ select option{background:#fff;}
       Тестовый чат
     </button>
     <div class="ns">Настройка</div>
-    <button class="ni" onclick="go('prompt',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      Промпт
-    </button>
     <button class="ni" onclick="go('keys',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
       API ключи
@@ -693,44 +689,6 @@ select option{background:#fff;}
 </div>
 
 <!-- ══ PROMPT (READ-ONLY — настоящий HARD_RULES в коде бота) ══ -->
-<div class="page" id="page-prompt">
-  <div class="ph"><div class="ph-title">Системный промпт</div><div class="ph-sub">Живой промпт из VPS · read-only · редактировать через правки HARD_RULES в коде бота</div></div>
-  <div class="card" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);">
-    <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--warn);font-weight:600;margin-bottom:8px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      Правка промпта из UI отключена
-    </div>
-    <div style="font-size:13px;color:var(--muted);line-height:1.6;">
-      Настоящий промпт собирается на VPS из 3 источников:<br>
-      <b>1. HARD_RULES</b> — жёсткие правила в коде (<code>/root/igs-bot/index.js</code>)<br>
-      <b>2. Obsidian сценарии</b> — инжектируются через RAG (pgvector)<br>
-      <b>3. Актуальные цены</b> — автоматически из Supabase <code>prices</code><br><br>
-      Редактирование из этого UI перезаписало бы только малую часть (<code>basePrompt</code>) и поломало бы логику. Чтобы изменить промпт — редактируй HARD_RULES в коде или Obsidian-сценарии.
-    </div>
-  </div>
-  <div class="card">
-    <div class="ct" style="justify-content:space-between;">
-      <span>Актуальный промпт с VPS (только для просмотра)</span>
-      <button class="btn btn-g" style="padding:5px 11px;font-size:12px;" onclick="loadLivePrompt()">🔄 Обновить</button>
-    </div>
-    <div class="field">
-      <textarea id="system-prompt" readonly style="min-height:420px;font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--bg3);cursor:default;" oninput="updateCount()" placeholder="Нажми &quot;Обновить&quot; для загрузки актуального промпта..."></textarea>
-      <div class="ccount"><span id="char-count">0</span> символов (живой промпт с VPS)</div>
-    </div>
-  </div>
-</div>
-
-<script>
-async function loadLivePrompt(){
-  try {
-    const data = await railwayFetch('/api/prompt-preview');
-    const ta = document.getElementById('system-prompt');
-    if(ta){ ta.value = data.prompt || '(пусто)'; if(typeof updateCount==='function') updateCount(); }
-    if(typeof toast==='function') toast('Промпт загружен с VPS');
-  } catch(e){ if(typeof toast==='function') toast('VPS: '+e.message,'err'); }
-}
-</script>
-
 <!-- ══ KEYS ══ -->
 <div class="page" id="page-keys">
   <div class="ph"><div class="ph-title">API ключи</div><div class="ph-sub">Ключи для тестового чата · VPS URL для управления ботом</div></div>
